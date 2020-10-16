@@ -39,6 +39,13 @@ This implementation will return the `appSetting` value for the specified `connec
 
 ```xml
 <appSettings>
-	<add key="MyConnectionName" value="UseDevelopmentStorage=true" />
+	<add key="azure" value="UseDevelopmentStorage=true" />
 </appSettings>
+
+<inbox
+    workQueueUri="azuremq://azure/server-inbox-work-queue"
+    .
+    .
+    .
+/>
 ```
