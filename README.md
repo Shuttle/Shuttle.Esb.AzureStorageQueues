@@ -17,8 +17,8 @@ The queue configuration is part of the specified uri, e.g.:
 />
 ```
 
-| Segment / Argument | Default    | Description |
-| --- | --- | --- | --- |
+| Segment / Argument | Default | Description |
+| --- | --- | --- | 
 | connection-name | required | Will be resolved by an `IAzureConfiguration` implemention (*see below*). |
 | queue-name | required | The name of queue to connection to. |
 | maxMessages | 1 | Specifies the number of messages to fetch from the queue. |
