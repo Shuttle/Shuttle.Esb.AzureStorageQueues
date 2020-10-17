@@ -19,8 +19,8 @@ The queue configuration is part of the specified uri, e.g.:
 
 | Segment / Argument | Default | Description |
 | --- | --- | --- | 
-| connection-name | required | Will be resolved by an `IAzureConfiguration` implemention (*see below*). |
-| queue-name | required | The name of queue to connection to. |
+| connection-name | required | Will be resolved by an `IAzureConfiguration` implementation (*see below*). |
+| queue-name | required | The name of queue to connect to. |
 | maxMessages | 1 | Specifies the number of messages to fetch from the queue. |
 
 ## IAzureConfiguration
@@ -39,7 +39,7 @@ This implementation will return the `appSetting` value for the specified `connec
 
 ```xml
 <appSettings>
-	<add key="azure" value="UseDevelopmentStorage=true" />
+    <add key="azure" value="UseDevelopmentStorage=true" />
 </appSettings>
 
 <inbox
