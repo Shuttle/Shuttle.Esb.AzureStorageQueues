@@ -22,7 +22,7 @@ namespace Shuttle.Esb.AzureMQ
             if (uri.LocalPath == "/" || uri.Segments.Length != 2)
             {
                 throw new UriFormatException(string.Format(Esb.Resources.UriFormatException,
-                    "sql://{{storage-connection-string-name}}/{{queue-name}}",  uri));
+                    $"{Scheme}://{{storage-connection-string-name}}/{{queue-name}}",  uri));
             }
 
             Uri = uri;
