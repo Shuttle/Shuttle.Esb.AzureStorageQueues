@@ -25,4 +25,4 @@ namespace Shuttle.Esb.AzureMQ.Tests
             return mock.Object;
         }
     }
-}
+}           
