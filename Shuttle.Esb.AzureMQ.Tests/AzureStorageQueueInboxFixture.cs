@@ -35,7 +35,8 @@ namespace Shuttle.Esb.AzureMQ.Tests
         [Test]
         public void Should_be_able_to_expire_a_message()
         {
-            TestInboxExpiry(AzureFixture.GetComponentContainer(), "azuremq://azure/{0}");
+            var componentContainer = AzureFixture.GetComponentContainer();
+            TestInboxExpiry(componentContainer, "azuremq://azure/{0}");
         }
     }
 }

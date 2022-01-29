@@ -2,18 +2,19 @@
 using Ninject;
 using Shuttle.Core.Container;
 using Shuttle.Core.Ninject;
+using Shuttle.Esb.Tests;
 
 namespace Shuttle.Esb.AzureMQ.Tests
 {
     public static class AzureFixture
     {
-        public static Esb.Tests.ComponentContainer GetComponentContainer()
+        public static ComponentContainer GetComponentContainer()
         {
             var container = new NinjectComponentContainer(new StandardKernel());
 
             container.RegisterInstance(AzureStorageConfiguration());
 
-            return new Esb.Tests.ComponentContainer(container, () => container);
+            return new ComponentContainer(container, () => container);
         }
 
         private static IAzureStorageConfiguration AzureStorageConfiguration()
