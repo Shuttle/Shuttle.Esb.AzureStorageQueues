@@ -1,4 +1,8 @@
-# AzureStorageQueue
+# Azure Storage Queues
+
+```
+PM> Install-Package Shuttle.Esb.AzureMQ
+```
 
 In order to make use of the `AzureStorageQueue` you will need access to an Azure Storage account or [use the Azurite emulator for local Azure Storage development](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) for local development.
 
@@ -29,11 +33,15 @@ The queue configuration is part of the specified uri, e.g.:
 string GetConnectionString(string name);
 ```
 
-Should return the Azure Storage connection string to use.  For local `azurite` development this would be `UseDevelopmentStorage=true`.
+The `GetConnectionString()` method should return the Azure Storage connection string to use.  For local `azurite` development this would be `UseDevelopmentStorage=true`.
+
+The relevant `IAzureConfiguration` should be registered with the `IComponentRegistry`:
+
+```c#
+IComponentResolver.Register<IAzureConfiguration, DefaultAzureConfiguration>;
+```
 
 ## DefaultAzureConfiguration
-
-The `DefaultAzureConfiguration` instance implementing the `IAzureConfiguration` interface will be registered using the [container bootstrapping](http://shuttle.github.io/shuttle-core/overview-container/#Bootstrapping).  If you wish to override the configuration you should register your instance before calling the `ServiceBus.Register()` method.
 
 This implementation will return the `appSetting` value for the specified `connection-name` as the Azure Storage conenction string:
 
