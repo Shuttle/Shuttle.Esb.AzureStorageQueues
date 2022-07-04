@@ -8,7 +8,7 @@ namespace Shuttle.Esb.AzureMQ.Tests
         [Test]
         public void Should_be_able_to_handle_exceptions_in_receive_stage_of_receive_pipeline()
         {
-            TestExceptionHandling(AzureFixture.GetComponentContainer(), "azuremq://azure/{0}");
+            TestExceptionHandling(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
         }
     }
 }

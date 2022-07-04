@@ -31,7 +31,7 @@ namespace Shuttle.Esb.AzureMQ
         private readonly QueueClient _queueClient;
         private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IAzureStorageConfiguration configuration)
+        public AzureStorageQueue(Uri uri, IAzureMQConfiguration configuration)
         {
             Guard.AgainstNull(uri, nameof(uri));
             Guard.AgainstNull(configuration, nameof(configuration));
@@ -126,6 +126,8 @@ namespace Shuttle.Esb.AzureMQ
         }
 
         public Uri Uri { get; }
+        public bool IsStream => false;
+
         public void Create()
         {
             lock (_lock)

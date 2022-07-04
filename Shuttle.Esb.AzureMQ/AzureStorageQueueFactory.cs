@@ -5,10 +5,10 @@ namespace Shuttle.Esb.AzureMQ
 {
     public class AzureStorageQueueFactory : IQueueFactory
     {
-        private readonly IAzureStorageConfiguration _configuration;
+        private readonly IAzureMQConfiguration _configuration;
         public string Scheme => AzureStorageQueueUriParser.Scheme;
 
-        public AzureStorageQueueFactory(IAzureStorageConfiguration configuration)
+        public AzureStorageQueueFactory(IAzureMQConfiguration configuration)
         {
             Guard.AgainstNull(configuration, nameof(configuration));
 

@@ -1,6 +1,6 @@
 ﻿namespace Shuttle.Esb.AzureMQ
 {
-    public interface IAzureStorageConfiguration
+    public interface IAzureMQConfiguration
     {
         string GetConnectionString(string name);
     }

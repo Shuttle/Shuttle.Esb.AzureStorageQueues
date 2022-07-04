@@ -1,29 +1,21 @@
-﻿using Moq;
-using Ninject;
-using Shuttle.Core.Container;
-using Shuttle.Core.Ninject;
-using Shuttle.Esb.Tests;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Shuttle.Esb.AzureMQ.Tests
 {
     public static class AzureFixture
     {
-        public static ComponentContainer GetComponentContainer()
+        public static IServiceCollection GetServiceCollection()
         {
-            var container = new NinjectComponentContainer(new StandardKernel());
+            var services = new ServiceCollection();
 
-            container.RegisterInstance(AzureStorageConfiguration());
+            services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+            services.AddAzureMQ(builder =>
+            {
+                builder.AddConnectionString("azure", "UseDevelopmentStorage=true");
+            });
 
-            return new ComponentContainer(container, () => container);
-        }
-
-        private static IAzureStorageConfiguration AzureStorageConfiguration()
-        {
-            var mock = new Mock<IAzureStorageConfiguration>();
-
-            mock.Setup(m => m.GetConnectionString(It.IsAny<string>())).Returns("UseDevelopmentStorage=true");
-
-            return mock.Object;
+            return services;
         }
     }
 }           

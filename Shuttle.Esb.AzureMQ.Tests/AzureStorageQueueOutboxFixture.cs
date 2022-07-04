@@ -9,7 +9,7 @@ namespace Shuttle.Esb.AzureMQ.Tests
         [TestCase(false)]
         public void Should_be_able_handle_errors(bool isTransactionalEndpoint)
         {
-            TestOutboxSending(AzureFixture.GetComponentContainer(), "azuremq://azure/{0}", isTransactionalEndpoint);
+            TestOutboxSending(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", isTransactionalEndpoint);
         }
     }
 }

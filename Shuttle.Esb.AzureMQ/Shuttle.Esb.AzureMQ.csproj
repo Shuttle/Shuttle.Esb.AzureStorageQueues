@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Queues" Version="12.9.0" />
-    <PackageReference Include="Shuttle.Core.Uris" Version="10.0.5" />
-    <PackageReference Include="Shuttle.Esb" Version="12.0.1" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.10.0" />
+    <PackageReference Include="Shuttle.Core.Uris" Version="10.0.6" />
+    <PackageReference Include="Shuttle.Esb" Version="13.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +17,21 @@
     <None Include=".package\package.nuspec.template" />
     <None Include=".package\Shuttle.NuGetPackager.MSBuild.dll" />
     <None Include=".package\Shuttle.NuGetPackager.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

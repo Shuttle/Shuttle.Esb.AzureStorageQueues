@@ -10,8 +10,8 @@ namespace Shuttle.Esb.AzureMQ.Tests
         [TestCase(true)]
         public void Should_be_able_to_distribute_messages(bool isTransactionalEndpoint)
         {
-            TestDistributor(AzureFixture.GetComponentContainer(), 
-                AzureFixture.GetComponentContainer(), @"azuremq://azure/{0}", isTransactionalEndpoint);
+            TestDistributor(AzureFixture.GetServiceCollection(), 
+                AzureFixture.GetServiceCollection(), @"azuremq://azure/{0}", isTransactionalEndpoint);
         }
     }
 }
