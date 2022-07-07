@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
@@ -17,16 +18,11 @@ namespace Shuttle.Esb.AzureMQ
 
             builder?.Invoke(configurationBuilder);
 
-            var azureMQConfigurationType = typeof(IAzureMQConfiguration);
-
-            if (services.All(item=> item.ServiceType != azureMQConfigurationType))
-            {
-                services.AddSingleton<IAzureMQConfiguration, AzureMQConfiguration>();
-            }
-
-            services.AddSingleton<IQueueFactory, AzureStorageQueueFactory>();
             services.AddSingleton<IValidateOptions<ConnectionStringSettings>, ConnectionStringSettingsValidator>();
 
+            services.TryAddSingleton<IAzureMQConfiguration, AzureMQConfiguration>();
+            services.TryAddSingleton<IQueueFactory, AzureStorageQueueFactory>();
+            
             return services;
         }
     }

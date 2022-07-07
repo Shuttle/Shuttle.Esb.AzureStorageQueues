@@ -16,7 +16,7 @@ namespace Shuttle.Esb.AzureMQ
                 return ValidateOptionsResult.Fail(Resources.ConnectionStringSettingsConnectionStringException);
             }
 
-            return ValidateOptionsResult.Fail(name);
+            return ValidateOptionsResult.Success;
         }
     }
 }
