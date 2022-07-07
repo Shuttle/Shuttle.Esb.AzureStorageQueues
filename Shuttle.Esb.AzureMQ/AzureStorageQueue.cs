@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 using Shuttle.Core.Streams;
 
@@ -31,16 +32,23 @@ namespace Shuttle.Esb.AzureMQ
         private readonly QueueClient _queueClient;
         private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IAzureMQConfiguration configuration)
+        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringSettings> connectionStringOptions)
         {
             Guard.AgainstNull(uri, nameof(uri));
-            Guard.AgainstNull(configuration, nameof(configuration));
+            Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));
 
             Uri = uri;
 
             var parser = new AzureStorageQueueUriParser(uri);
 
-            _queueClient = new QueueClient(configuration.GetConnectionString(parser.StorageConnectionStringName), parser.QueueName);
+            var connectionStringSettings = connectionStringOptions.Get(parser.StorageConnectionStringName);
+
+            if (connectionStringSettings == null)
+            {
+                throw new InvalidOperationException(string.Format(Resources.UnknownConnectionStringException, parser.StorageConnectionStringName));
+            }
+
+            _queueClient = new QueueClient(connectionStringSettings.ConnectionString, parser.QueueName);
             _maxMessages = parser.MaxMessages;
         }
 
@@ -57,7 +65,10 @@ namespace Shuttle.Esb.AzureMQ
             Guard.AgainstNull(message, nameof(message));
             Guard.AgainstNull(stream, nameof(stream));
 
-            _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()));
+            lock (_lock)
+            {
+                _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()));
+            }
         }
 
         public ReceivedMessage GetMessage()

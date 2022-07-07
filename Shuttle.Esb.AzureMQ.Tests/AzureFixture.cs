@@ -10,7 +10,7 @@ namespace Shuttle.Esb.AzureMQ.Tests
             var services = new ServiceCollection();
 
             services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
-            services.AddAzureMQ(builder =>
+            services.AddAzureStorageQueues(builder =>
             {
                 builder.AddConnectionString("azure", "UseDevelopmentStorage=true");
             });

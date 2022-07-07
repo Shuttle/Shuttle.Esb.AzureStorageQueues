@@ -1,25 +1,26 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
 namespace Shuttle.Esb.AzureMQ
 {
     public class AzureStorageQueueFactory : IQueueFactory
     {
-        private readonly IAzureMQConfiguration _configuration;
+        private readonly IOptionsMonitor<ConnectionStringSettings> _connectionStringOptions;
         public string Scheme => AzureStorageQueueUriParser.Scheme;
 
-        public AzureStorageQueueFactory(IAzureMQConfiguration configuration)
+        public AzureStorageQueueFactory(IOptionsMonitor<ConnectionStringSettings> connectionStringOptions)
         {
-            Guard.AgainstNull(configuration, nameof(configuration));
+            Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));
 
-            _configuration = configuration;
+            _connectionStringOptions = connectionStringOptions;
         }
 
         public IQueue Create(Uri uri)
         {
             Guard.AgainstNull(uri, "uri");
 
-            return new AzureStorageQueue(uri, _configuration);
+            return new AzureStorageQueue(uri, _connectionStringOptions);
         }
                                                 
         public bool CanCreate(Uri uri)

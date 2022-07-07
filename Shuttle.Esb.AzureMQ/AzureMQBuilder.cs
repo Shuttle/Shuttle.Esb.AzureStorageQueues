@@ -4,18 +4,18 @@ using Shuttle.Core.Contract;
 
 namespace Shuttle.Esb.AzureMQ
 {
-    public class AzureMQConfigurationBuilder
+    public class AzureMQBuilder
     {
         private readonly IServiceCollection _services;
 
-        public AzureMQConfigurationBuilder(IServiceCollection services)
+        public AzureMQBuilder(IServiceCollection services)
         {
             Guard.AgainstNull(services, nameof(services));
             
             _services = services;
         }
 
-        public AzureMQConfigurationBuilder AddConnectionString(string name)
+        public AzureMQBuilder AddConnectionString(string name)
         {
             _services.AddOptions<ConnectionStringSettings>(name).Configure<IConfiguration>((option, configuration) =>
             {
@@ -30,7 +30,7 @@ namespace Shuttle.Esb.AzureMQ
             return this;
         }
 
-        public AzureMQConfigurationBuilder AddConnectionString(string name, string connectionString)
+        public AzureMQBuilder AddConnectionString(string name, string connectionString)
         {
             _services.AddOptions<ConnectionStringSettings>(name).Configure(option =>
             {
