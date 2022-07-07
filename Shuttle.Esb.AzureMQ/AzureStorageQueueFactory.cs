@@ -22,12 +22,5 @@ namespace Shuttle.Esb.AzureMQ
 
             return new AzureStorageQueue(uri, _connectionStringOptions);
         }
-                                                
-        public bool CanCreate(Uri uri)
-        {                                   
-            Guard.AgainstNull(uri, "uri");
-
-            return Scheme.Equals(uri.Scheme, StringComparison.InvariantCultureIgnoreCase);
-        }
     }
 }
