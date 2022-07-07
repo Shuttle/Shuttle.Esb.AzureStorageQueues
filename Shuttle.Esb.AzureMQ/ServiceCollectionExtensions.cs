@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
 namespace Shuttle.Esb.AzureMQ
@@ -20,10 +21,11 @@ namespace Shuttle.Esb.AzureMQ
 
             if (services.All(item=> item.ServiceType != azureMQConfigurationType))
             {
-                services.AddSingleton(configurationBuilder.GetConfiguration());
+                services.AddSingleton<IAzureMQConfiguration, AzureMQConfiguration>();
             }
 
             services.AddSingleton<IQueueFactory, AzureStorageQueueFactory>();
+            services.AddSingleton<IValidateOptions<ConnectionStringSettings>, ConnectionStringSettingsValidator>();
 
             return services;
         }

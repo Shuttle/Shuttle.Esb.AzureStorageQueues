@@ -61,6 +61,24 @@ namespace Shuttle.Esb.AzureMQ {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection string setting with name &apos;{0}&apos; does not have a connection string..
+        /// </summary>
+        public static string ConnectionStringSettingsConnectionStringException {
+            get {
+                return ResourceManager.GetString("ConnectionStringSettingsConnectionStringException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A connection string requires a name..
+        /// </summary>
+        public static string ConnectionStringSettingsNameException {
+            get {
+                return ResourceManager.GetString("ConnectionStringSettingsNameException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is no connection string registered with name &apos;{0}&apos;..
         /// </summary>
         public static string UnknownConnectionStringException {

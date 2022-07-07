@@ -7,18 +7,12 @@ namespace Shuttle.Esb.AzureMQ
     public class AzureMQConfigurationBuilder
     {
         private readonly IServiceCollection _services;
-        private readonly AzureMQConfiguration _configuration = new AzureMQConfiguration();
 
         public AzureMQConfigurationBuilder(IServiceCollection services)
         {
             Guard.AgainstNull(services, nameof(services));
             
             _services = services;
-        }
-
-        public IAzureMQConfiguration GetConfiguration()
-        {
-            return _configuration;
         }
 
         public AzureMQConfigurationBuilder AddConnectionString(string name)
@@ -31,8 +25,6 @@ namespace Shuttle.Esb.AzureMQ
 
                 option.ConnectionString = connectionString;
                 option.Name = name;
-
-                _configuration.AddConnectionString(name, option.ConnectionString);
             });
 
             return this;
@@ -40,7 +32,13 @@ namespace Shuttle.Esb.AzureMQ
 
         public AzureMQConfigurationBuilder AddConnectionString(string name, string connectionString)
         {
-            _configuration.AddConnectionString(name, connectionString);
+            _services.AddOptions<ConnectionStringSettings>(name).Configure(option =>
+            {
+                Guard.AgainstNullOrEmptyString(connectionString, nameof(connectionString));
+
+                option.ConnectionString = connectionString;
+                option.Name = name;
+            });
 
             return this;
         }
