@@ -18,7 +18,7 @@ namespace Shuttle.Esb.AzureMQ
 
             builder?.Invoke(configurationBuilder);
 
-            services.AddSingleton<IValidateOptions<ConnectionStringSettings>, ConnectionStringSettingsValidator>();
+            services.AddSingleton<IValidateOptions<ConnectionStringOptions>, ConnectionStringOptionsValidator>();
 
             services.TryAddSingleton<IQueueFactory, AzureStorageQueueFactory>();
             

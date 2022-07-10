@@ -2,9 +2,9 @@
 
 namespace Shuttle.Esb.AzureMQ
 {
-    public class ConnectionStringSettingsValidator : IValidateOptions<ConnectionStringSettings>
+    public class ConnectionStringOptionsValidator : IValidateOptions<ConnectionStringOptions>
     {
-        public ValidateOptionsResult Validate(string name, ConnectionStringSettings options)
+        public ValidateOptionsResult Validate(string name, ConnectionStringOptions options)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(options.Name))
             {

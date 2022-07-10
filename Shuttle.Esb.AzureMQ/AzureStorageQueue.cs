@@ -32,7 +32,7 @@ namespace Shuttle.Esb.AzureMQ
         private readonly QueueClient _queueClient;
         private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringSettings> connectionStringOptions)
+        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringOptions> connectionStringOptions)
         {
             Guard.AgainstNull(uri, nameof(uri));
             Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));

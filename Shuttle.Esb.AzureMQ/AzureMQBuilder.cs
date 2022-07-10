@@ -17,7 +17,7 @@ namespace Shuttle.Esb.AzureMQ
 
         public AzureMQBuilder AddConnectionString(string name)
         {
-            _services.AddOptions<ConnectionStringSettings>(name).Configure<IConfiguration>((option, configuration) =>
+            _services.AddOptions<ConnectionStringOptions>(name).Configure<IConfiguration>((option, configuration) =>
             {
                 var connectionString = configuration.GetConnectionString(name);
 
@@ -32,7 +32,7 @@ namespace Shuttle.Esb.AzureMQ
 
         public AzureMQBuilder AddConnectionString(string name, string connectionString)
         {
-            _services.AddOptions<ConnectionStringSettings>(name).Configure(option =>
+            _services.AddOptions<ConnectionStringOptions>(name).Configure(option =>
             {
                 Guard.AgainstNullOrEmptyString(connectionString, nameof(connectionString));
 

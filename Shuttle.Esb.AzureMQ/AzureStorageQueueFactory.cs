@@ -6,10 +6,10 @@ namespace Shuttle.Esb.AzureMQ
 {
     public class AzureStorageQueueFactory : IQueueFactory
     {
-        private readonly IOptionsMonitor<ConnectionStringSettings> _connectionStringOptions;
+        private readonly IOptionsMonitor<ConnectionStringOptions> _connectionStringOptions;
         public string Scheme => AzureStorageQueueUriParser.Scheme;
 
-        public AzureStorageQueueFactory(IOptionsMonitor<ConnectionStringSettings> connectionStringOptions)
+        public AzureStorageQueueFactory(IOptionsMonitor<ConnectionStringOptions> connectionStringOptions)
         {
             Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));
 
