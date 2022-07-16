@@ -6,18 +6,18 @@ namespace Shuttle.Esb.AzureMQ
 {
     public class AzureMQBuilder
     {
-        private readonly IServiceCollection _services;
+        public IServiceCollection Services { get; }
 
         public AzureMQBuilder(IServiceCollection services)
         {
             Guard.AgainstNull(services, nameof(services));
             
-            _services = services;
+            Services = services;
         }
 
         public AzureMQBuilder AddConnectionString(string name)
         {
-            _services.AddOptions<ConnectionStringOptions>(name).Configure<IConfiguration>((option, configuration) =>
+            Services.AddOptions<ConnectionStringOptions>(name).Configure<IConfiguration>((option, configuration) =>
             {
                 var connectionString = configuration.GetConnectionString(name);
 
@@ -32,7 +32,7 @@ namespace Shuttle.Esb.AzureMQ
 
         public AzureMQBuilder AddConnectionString(string name, string connectionString)
         {
-            _services.AddOptions<ConnectionStringOptions>(name).Configure(option =>
+            Services.AddOptions<ConnectionStringOptions>(name).Configure(option =>
             {
                 Guard.AgainstNullOrEmptyString(connectionString, nameof(connectionString));
 
