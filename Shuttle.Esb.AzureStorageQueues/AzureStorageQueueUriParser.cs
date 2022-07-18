@@ -4,7 +4,7 @@ using System.Xml.XPath;
 using Shuttle.Core.Contract;
 using Shuttle.Core.Uris;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueueUriParser
     {

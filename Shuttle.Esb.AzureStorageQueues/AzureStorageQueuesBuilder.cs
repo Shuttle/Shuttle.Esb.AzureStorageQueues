@@ -2,20 +2,20 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
-    public class AzureMQBuilder
+    public class AzureStorageQueuesBuilder
     {
         public IServiceCollection Services { get; }
 
-        public AzureMQBuilder(IServiceCollection services)
+        public AzureStorageQueuesBuilder(IServiceCollection services)
         {
             Guard.AgainstNull(services, nameof(services));
             
             Services = services;
         }
 
-        public AzureMQBuilder AddConnectionString(string name)
+        public AzureStorageQueuesBuilder AddConnectionString(string name)
         {
             Services.AddOptions<ConnectionStringOptions>(name).Configure<IConfiguration>((option, configuration) =>
             {
@@ -30,7 +30,7 @@ namespace Shuttle.Esb.AzureMQ
             return this;
         }
 
-        public AzureMQBuilder AddConnectionString(string name, string connectionString)
+        public AzureStorageQueuesBuilder AddConnectionString(string name, string connectionString)
         {
             Services.AddOptions<ConnectionStringOptions>(name).Configure(option =>
             {

@@ -5,16 +5,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddAzureStorageQueues(this IServiceCollection services,
-            Action<AzureMQBuilder> builder = null)
+            Action<AzureStorageQueuesBuilder> builder = null)
         {
             Guard.AgainstNull(services, nameof(services));
 
-            var configurationBuilder = new AzureMQBuilder(services);
+            var configurationBuilder = new AzureStorageQueuesBuilder(services);
 
             builder?.Invoke(configurationBuilder);
 

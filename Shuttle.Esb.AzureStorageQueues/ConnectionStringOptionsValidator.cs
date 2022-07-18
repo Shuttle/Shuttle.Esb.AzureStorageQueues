@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public class ConnectionStringOptionsValidator : IValidateOptions<ConnectionStringOptions>
     {

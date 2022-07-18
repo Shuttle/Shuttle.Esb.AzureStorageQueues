@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueueFactory : IQueueFactory
     {

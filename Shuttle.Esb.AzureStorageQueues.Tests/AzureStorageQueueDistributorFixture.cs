@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Shuttle.Esb.Tests;
 
-namespace Shuttle.Esb.AzureMQ.Tests
+namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
     public class AzureStorageQueueDistributorFixture : DistributorFixture
     {

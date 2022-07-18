@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Shuttle.Esb.AzureMQ.Tests
+namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
     public static class AzureFixture
     {

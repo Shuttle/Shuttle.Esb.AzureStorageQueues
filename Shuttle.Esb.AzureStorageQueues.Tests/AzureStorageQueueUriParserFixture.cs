@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace Shuttle.Esb.AzureMQ.Tests
+namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
     [TestFixture]
     public class AzureStorageQueueUriParserFixture

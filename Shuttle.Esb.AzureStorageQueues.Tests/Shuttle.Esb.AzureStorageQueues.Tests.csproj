@@ -15,6 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shuttle.Esb.AzureMQ\Shuttle.Esb.AzureMQ.csproj" />
+    <ProjectReference Include="..\Shuttle.Esb.AzureStorageQueues\Shuttle.Esb.AzureStorageQueues.csproj" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 # Azure Storage Queues
 
 ```
-PM> Install-Package Shuttle.Esb.AzureMQ
+PM> Install-Package Shuttle.Esb.AzureStorageQueues
 ```
 
 In order to make use of the `AzureStorageQueue` you will need access to an Azure Storage account or [use the Azurite emulator for local Azure Storage development](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) for local development.

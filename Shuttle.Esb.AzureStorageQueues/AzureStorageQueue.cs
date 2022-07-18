@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 using Shuttle.Core.Streams;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueue : IQueue, ICreateQueue, IDropQueue, IDisposable, IPurgeQueue
     {

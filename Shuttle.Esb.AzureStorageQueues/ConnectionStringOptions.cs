@@ -1,4 +1,4 @@
-﻿namespace Shuttle.Esb.AzureMQ
+﻿namespace Shuttle.Esb.AzureStorageQueues
 {
     public class ConnectionStringOptions
     {

@@ -2,22 +2,20 @@
 
 <package>
 	<metadata>
-		<id>Shuttle.Esb.AzureMQ</id>
-		<version>13.0.0</version>
+		<id>Shuttle.Esb.AzureStorageQueues</id>
+		<version>#{SemanticVersion}#</version>
 		<authors>Eben Roux</authors>
 		<owners>Eben Roux</owners>
 		<license type="expression">BSD-3-Clause</license>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<icon>images\logo.png</icon>
 		<readme>docs\README.md</readme>
-		<repository type="git" url="https://github.com/Shuttle/Shuttle.Esb.AzureMQ.git" />
+		<repository type="git" url="https://github.com/Shuttle/Shuttle.Esb.AzureStorageQueues.git" />
 		<description>Azure Storage Queue implementation for use with Shuttle.Esb.</description>
-		<copyright>Copyright (c) 2022, Eben Roux</copyright>
+		<copyright>Copyright (c) #{Year}#, Eben Roux</copyright>
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
-      <dependency id="Azure.Storage.Queues" version="12.10.0" />
-      <dependency id="Shuttle.Core.Uris" version="10.0.6" />
-      <dependency id="Shuttle.Esb" version="13.0.0" />
+#{Dependencies}#
 		</dependencies>
 	</metadata>
 	<files>
