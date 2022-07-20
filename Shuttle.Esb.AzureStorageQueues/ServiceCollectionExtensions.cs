@@ -14,9 +14,9 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             Guard.AgainstNull(services, nameof(services));
 
-            var configurationBuilder = new AzureStorageQueuesBuilder(services);
+            var azureStorageQueuesBuilder = new AzureStorageQueuesBuilder(services);
 
-            builder?.Invoke(configurationBuilder);
+            builder?.Invoke(azureStorageQueuesBuilder);
 
             services.AddSingleton<IValidateOptions<ConnectionStringOptions>, ConnectionStringOptionsValidator>();
 

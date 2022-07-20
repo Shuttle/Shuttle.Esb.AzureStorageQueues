@@ -25,7 +25,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
-        private readonly Dictionary<string, AcknowledgementToken> _acknowledgementTokens = new Dictionary<string,AcknowledgementToken>();
+        private readonly Dictionary<string, AcknowledgementToken> _acknowledgementTokens = new Dictionary<string, AcknowledgementToken>();
         private readonly Queue<ReceivedMessage> _receivedMessages = new Queue<ReceivedMessage>();
         private readonly object _lock = new object();
 

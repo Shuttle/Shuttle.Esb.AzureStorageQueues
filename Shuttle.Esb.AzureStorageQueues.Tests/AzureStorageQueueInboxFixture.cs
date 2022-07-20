@@ -5,11 +5,13 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
     public class AzureStorageQueueInboxFixture : InboxFixture
     {
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Should_be_able_handle_errors(bool isTransactionalEndpoint)
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void Should_be_able_handle_errors(bool hasErrorQueue, bool isTransactionalEndpoint)
         {
-            TestInboxError(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", isTransactionalEndpoint);
+            TestInboxError(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", hasErrorQueue, isTransactionalEndpoint);
         }
 
         [TestCase(250, false)]
@@ -35,8 +37,7 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [Test]
         public void Should_be_able_to_expire_a_message()
         {
-            var componentContainer = AzureFixture.GetServiceCollection();
-            TestInboxExpiry(componentContainer, "azuremq://azure/{0}");
+            TestInboxExpiry(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
         }
     }
 }
