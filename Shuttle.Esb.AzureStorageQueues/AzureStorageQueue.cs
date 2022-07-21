@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.Options;
@@ -25,6 +27,9 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
+        private readonly CancellationToken _cancellationToken;
+        private readonly TimeSpan _infiniteTimeToLive = new TimeSpan(0, 0, -1);
+
         private readonly Dictionary<string, AcknowledgementToken> _acknowledgementTokens = new Dictionary<string, AcknowledgementToken>();
         private readonly Queue<ReceivedMessage> _receivedMessages = new Queue<ReceivedMessage>();
         private readonly object _lock = new object();
@@ -32,10 +37,12 @@ namespace Shuttle.Esb.AzureStorageQueues
         private readonly QueueClient _queueClient;
         private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringOptions> connectionStringOptions)
+        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringOptions> connectionStringOptions, CancellationToken cancellationToken)
         {
             Guard.AgainstNull(uri, nameof(uri));
             Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));
+
+            _cancellationToken = cancellationToken;
 
             Uri = uri;
 
@@ -67,7 +74,13 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             lock (_lock)
             {
-                _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()));
+                try
+                {
+                    _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()), null, _infiniteTimeToLive, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -77,7 +90,20 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 if (_receivedMessages.Count == 0)
                 {
-                    var messages = _queueClient.ReceiveMessages(_maxMessages);
+                    Response<QueueMessage[]> messages = null;
+
+                    try
+                    {
+                        messages = _queueClient.ReceiveMessages(_maxMessages, null, _cancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+
+                    if (messages == null)
+                    {
+                        return null;
+                    }
 
                     foreach (var message in messages.Value)
                     {
@@ -111,7 +137,13 @@ namespace Shuttle.Esb.AzureStorageQueues
                     _acknowledgementTokens.Remove(data.MessageId);
                 }
 
-                _queueClient.DeleteMessage(data.MessageId, data.PopReceipt);
+                try
+                {
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -126,8 +158,14 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             lock (_lock)
             {
-                _queueClient.SendMessage(data.MessageText);
-                _queueClient.DeleteMessage(data.MessageId, data.PopReceipt);
+                try
+                {
+                    _queueClient.SendMessage(data.MessageText, _cancellationToken);
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
 
                 if (_acknowledgementTokens.ContainsKey(data.MessageId))
                 {
@@ -143,7 +181,13 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             lock (_lock)
             {
-                _queueClient.CreateIfNotExists();
+                try
+                {
+                    _queueClient.CreateIfNotExists(null, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -151,7 +195,13 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             lock (_lock)
             {
-                _queueClient.DeleteIfExists();
+                try
+                {
+                    _queueClient.DeleteIfExists(_cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -173,7 +223,13 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             lock (_lock)
             {
-                _queueClient.ClearMessages();
+                try
+                {
+                    _queueClient.ClearMessages(_cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
     }

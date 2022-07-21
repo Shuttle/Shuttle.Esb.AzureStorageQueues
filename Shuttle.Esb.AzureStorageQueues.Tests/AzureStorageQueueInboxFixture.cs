@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Shuttle.Esb.Tests;
 
 namespace Shuttle.Esb.AzureStorageQueues.Tests
@@ -32,12 +33,6 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         public void Should_be_able_to_handle_a_deferred_message()
         {
             TestInboxDeferred(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
-        }
-
-        [Test]
-        public void Should_be_able_to_expire_a_message()
-        {
-            TestInboxExpiry(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
         }
     }
 }
