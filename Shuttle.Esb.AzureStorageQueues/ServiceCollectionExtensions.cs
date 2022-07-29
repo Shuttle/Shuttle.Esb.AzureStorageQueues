@@ -18,7 +18,31 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             builder?.Invoke(azureStorageQueuesBuilder);
 
-            services.AddSingleton<IValidateOptions<ConnectionStringOptions>, ConnectionStringOptionsValidator>();
+            services.AddSingleton<IValidateOptions<AzureStorageQueueOptions>, ConnectionStringOptionsValidator>();
+
+            foreach (var pair in azureStorageQueuesBuilder.AzureStorageQueueOptions)
+            {
+                services.AddOptions<AzureStorageQueueOptions>(pair.Key).Configure(options =>
+                {
+                    options.ConnectionString = pair.Value.ConnectionString;
+                    options.MaxMessages = pair.Value.MaxMessages;
+
+                    if (options.MaxMessages < 1)
+                    {
+                        options.MaxMessages = 1;
+                    }
+
+                    if (options.MaxMessages > 32)
+                    {
+                        options.MaxMessages = 32;
+                    }
+
+                    options.Configure += (sender, args) =>
+                    {
+                        pair.Value.OnConfigureConsumer(sender, args);
+                    };
+                });
+            }
 
             services.TryAddSingleton<IQueueFactory, AzureStorageQueueFactory>();
             

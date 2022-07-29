@@ -10,7 +10,7 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [TestCase(true)]
         public void Should_be_able_to_perform_full_processing(bool isTransactionalEndpoint)
         {
-            TestDeferredProcessing(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", isTransactionalEndpoint);
+            TestDeferredProcessing(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", isTransactionalEndpoint);
         }
     }
 }

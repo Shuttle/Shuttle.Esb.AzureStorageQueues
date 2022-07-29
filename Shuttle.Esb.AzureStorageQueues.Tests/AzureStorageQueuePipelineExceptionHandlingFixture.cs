@@ -8,7 +8,7 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [Test]
         public void Should_be_able_to_handle_exceptions_in_receive_stage_of_receive_pipeline()
         {
-            TestExceptionHandling(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
+            TestExceptionHandling(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shuttle.Core.Contract;
 
@@ -6,6 +7,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueuesBuilder
     {
+        internal readonly Dictionary<string, AzureStorageQueueOptions> AzureStorageQueueOptions = new Dictionary<string, AzureStorageQueueOptions>();
         public IServiceCollection Services { get; }
 
         public AzureStorageQueuesBuilder(IServiceCollection services)
@@ -15,30 +17,14 @@ namespace Shuttle.Esb.AzureStorageQueues
             Services = services;
         }
 
-        public AzureStorageQueuesBuilder AddConnectionString(string name)
+        public AzureStorageQueuesBuilder AddOptions(string name, AzureStorageQueueOptions amazonSqsOptions)
         {
-            Services.AddOptions<ConnectionStringOptions>(name).Configure<IConfiguration>((option, configuration) =>
-            {
-                var connectionString = configuration.GetConnectionString(name);
+            Guard.AgainstNullOrEmptyString(name, nameof(name));
+            Guard.AgainstNull(amazonSqsOptions, nameof(amazonSqsOptions));
 
-                Guard.AgainstNullOrEmptyString(connectionString, nameof(connectionString));
+            AzureStorageQueueOptions.Remove(name);
 
-                option.ConnectionString = connectionString;
-                option.Name = name;
-            });
-
-            return this;
-        }
-
-        public AzureStorageQueuesBuilder AddConnectionString(string name, string connectionString)
-        {
-            Services.AddOptions<ConnectionStringOptions>(name).Configure(option =>
-            {
-                Guard.AgainstNullOrEmptyString(connectionString, nameof(connectionString));
-
-                option.ConnectionString = connectionString;
-                option.Name = name;
-            });
+            AzureStorageQueueOptions.Add(name, amazonSqsOptions);
 
             return this;
         }

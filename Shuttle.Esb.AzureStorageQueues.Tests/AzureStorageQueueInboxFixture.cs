@@ -12,27 +12,27 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [TestCase(false, false)]
         public void Should_be_able_handle_errors(bool hasErrorQueue, bool isTransactionalEndpoint)
         {
-            TestInboxError(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", hasErrorQueue, isTransactionalEndpoint);
+            TestInboxError(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", hasErrorQueue, isTransactionalEndpoint);
         }
 
         [TestCase(250, false)]
         [TestCase(250, true)]
         public void Should_be_able_to_process_messages_concurrently(int msToComplete, bool isTransactionalEndpoint)
         {
-            TestInboxConcurrency(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", msToComplete, isTransactionalEndpoint);
+            TestInboxConcurrency(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", msToComplete, isTransactionalEndpoint);
         }
 
         [TestCase(100, true)]
         [TestCase(100, false)]
         public void Should_be_able_to_process_queue_timeously(int count, bool isTransactionalEndpoint)
         {
-            TestInboxThroughput(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}", 1000, count, 5, isTransactionalEndpoint);
+            TestInboxThroughput(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", 1000, count, 5, isTransactionalEndpoint);
         }
 
         [Test]
         public void Should_be_able_to_handle_a_deferred_message()
         {
-            TestInboxDeferred(AzureFixture.GetServiceCollection(), "azuremq://azure/{0}");
+            TestInboxDeferred(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}");
         }
     }
 }

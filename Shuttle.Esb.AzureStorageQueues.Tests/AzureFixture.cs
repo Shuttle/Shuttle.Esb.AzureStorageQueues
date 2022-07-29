@@ -12,7 +12,10 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
             services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
             services.AddAzureStorageQueues(builder =>
             {
-                builder.AddConnectionString("azure", "UseDevelopmentStorage=true");
+                builder.AddOptions("azure", new AzureStorageQueueOptions
+                {
+                    ConnectionString = "UseDevelopmentStorage=true"
+                });
             });
 
             return services;

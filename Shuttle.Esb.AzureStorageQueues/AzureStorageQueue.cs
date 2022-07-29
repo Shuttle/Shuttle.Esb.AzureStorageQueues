@@ -5,7 +5,6 @@ using System.Threading;
 using Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 using Shuttle.Core.Streams;
 
@@ -27,6 +26,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
+        private readonly AzureStorageQueueOptions _azureStorageQueueOptions;
         private readonly CancellationToken _cancellationToken;
         private readonly TimeSpan _infiniteTimeToLive = new TimeSpan(0, 0, -1);
 
@@ -35,28 +35,23 @@ namespace Shuttle.Esb.AzureStorageQueues
         private readonly object _lock = new object();
 
         private readonly QueueClient _queueClient;
-        private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IOptionsMonitor<ConnectionStringOptions> connectionStringOptions, CancellationToken cancellationToken)
+        public AzureStorageQueue(QueueUri uri, AzureStorageQueueOptions azureStorageQueueOptions, CancellationToken cancellationToken)
         {
             Guard.AgainstNull(uri, nameof(uri));
-            Guard.AgainstNull(connectionStringOptions, nameof(connectionStringOptions));
+            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
 
             _cancellationToken = cancellationToken;
 
             Uri = uri;
 
-            var parser = new AzureStorageQueueUriParser(uri);
+            _azureStorageQueueOptions = azureStorageQueueOptions;
 
-            var connectionStringSettings = connectionStringOptions.Get(parser.StorageConnectionStringName);
+            var queueClientOptions = new QueueClientOptions();
 
-            if (connectionStringSettings == null)
-            {
-                throw new InvalidOperationException(string.Format(Resources.UnknownConnectionStringException, parser.StorageConnectionStringName));
-            }
+            _azureStorageQueueOptions.OnConfigureConsumer(this, new ConfigureEventArgs(queueClientOptions));
 
-            _queueClient = new QueueClient(connectionStringSettings.ConnectionString, parser.QueueName);
-            _maxMessages = parser.MaxMessages;
+            _queueClient = new QueueClient(_azureStorageQueueOptions.ConnectionString, Uri.QueueName, queueClientOptions);
         }
 
         public bool IsEmpty()
@@ -94,7 +89,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
                     try
                     {
-                        messages = _queueClient.ReceiveMessages(_maxMessages, null, _cancellationToken);
+                        messages = _queueClient.ReceiveMessages(_azureStorageQueueOptions.MaxMessages, null, _cancellationToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -174,7 +169,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
-        public Uri Uri { get; }
+        public QueueUri Uri { get; }
         public bool IsStream => false;
 
         public void Create()

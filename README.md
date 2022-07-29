@@ -14,7 +14,7 @@ The queue configuration is part of the specified uri, e.g.:
 
 ``` xml
 <inbox
-    workQueueUri="azuremq://connection-name/queue-name?maxMessages=15"
+    workQueueUri="azuresq://configuration-name/queue-name"
     .
     .
     .

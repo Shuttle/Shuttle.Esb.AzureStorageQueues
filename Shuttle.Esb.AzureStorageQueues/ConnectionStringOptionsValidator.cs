@@ -2,18 +2,18 @@
 
 namespace Shuttle.Esb.AzureStorageQueues
 {
-    public class ConnectionStringOptionsValidator : IValidateOptions<ConnectionStringOptions>
+    public class ConnectionStringOptionsValidator : IValidateOptions<AzureStorageQueueOptions>
     {
-        public ValidateOptionsResult Validate(string name, ConnectionStringOptions options)
+        public ValidateOptionsResult Validate(string name, AzureStorageQueueOptions options)
         {
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(options.Name))
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return ValidateOptionsResult.Fail(Resources.ConnectionStringSettingsNameException);
+                return ValidateOptionsResult.Fail(Esb.Resources.QueueConfigurationNameException);
             }
 
             if (string.IsNullOrWhiteSpace(options.ConnectionString))
             {
-                return ValidateOptionsResult.Fail(Resources.ConnectionStringSettingsConnectionStringException);
+                return ValidateOptionsResult.Fail(string.Format(Resources.QueueConfigurationItemException, name, nameof(options.ConnectionString)));
             }
 
             return ValidateOptionsResult.Success;
