@@ -9,12 +9,11 @@ namespace Shuttle.Esb.AzureStorageQueues
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddAzureStorageQueues(this IServiceCollection services,
-            Action<AzureStorageQueuesBuilder> builder = null)
+        public static IServiceCollection AddAzureStorageQueues(this IServiceCollection services, Action<AzureStorageQueueBuilder> builder = null)
         {
             Guard.AgainstNull(services, nameof(services));
 
-            var azureStorageQueuesBuilder = new AzureStorageQueuesBuilder(services);
+            var azureStorageQueuesBuilder = new AzureStorageQueueBuilder(services);
 
             builder?.Invoke(azureStorageQueuesBuilder);
 
