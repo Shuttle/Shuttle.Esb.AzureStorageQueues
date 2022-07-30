@@ -2,7 +2,7 @@
 
 namespace Shuttle.Esb.AzureStorageQueues
 {
-    public class ConnectionStringOptionsValidator : IValidateOptions<AzureStorageQueueOptions>
+    public class AzureStorageQueueOptionsValidator : IValidateOptions<AzureStorageQueueOptions>
     {
         public ValidateOptionsResult Validate(string name, AzureStorageQueueOptions options)
         {

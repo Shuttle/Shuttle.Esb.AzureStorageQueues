@@ -18,7 +18,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             builder?.Invoke(azureStorageQueuesBuilder);
 
-            services.AddSingleton<IValidateOptions<AzureStorageQueueOptions>, ConnectionStringOptionsValidator>();
+            services.AddSingleton<IValidateOptions<AzureStorageQueueOptions>, AzureStorageQueueOptionsValidator>();
 
             foreach (var pair in azureStorageQueuesBuilder.AzureStorageQueueOptions)
             {
