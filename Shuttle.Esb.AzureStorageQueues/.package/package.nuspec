@@ -16,7 +16,6 @@
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
       <dependency id="Azure.Storage.Queues" version="12.10.0" />
-      <dependency id="Shuttle.Core.Uris" version="10.0.6" />
       <dependency id="Shuttle.Esb" version="13.0.0" />
 		</dependencies>
 	</metadata>
