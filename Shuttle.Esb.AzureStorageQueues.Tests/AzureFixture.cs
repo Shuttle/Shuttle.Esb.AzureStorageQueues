@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shuttle.Core.Pipelines;
@@ -33,11 +34,19 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
 
             services.AddAzureStorageQueues(builder =>
             {
-                builder.AddOptions("azure", new AzureStorageQueueOptions
+                var azureStorageQueueOptions = new AzureStorageQueueOptions
                 {
                     ConnectionString = "UseDevelopmentStorage=true",
-                    MaxMessages = 20
-                });
+                    MaxMessages = 20,
+                    VisibilityTimeout = null
+                };
+
+                azureStorageQueueOptions.Configure += (sender, args) =>
+                {
+                    Console.WriteLine($"[event] : Configure / Uri = '{((IQueue)sender).Uri}'");
+                };
+
+                builder.AddOptions("azure", azureStorageQueueOptions);
             });
 
             return services;

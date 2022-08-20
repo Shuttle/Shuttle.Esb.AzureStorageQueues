@@ -89,7 +89,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
                     try
                     {
-                        messages = _queueClient.ReceiveMessages(_azureStorageQueueOptions.MaxMessages, null, _cancellationToken);
+                        messages = _queueClient.ReceiveMessages(_azureStorageQueueOptions.MaxMessages, _azureStorageQueueOptions.VisibilityTimeout, _cancellationToken);
                     }
                     catch (OperationCanceledException)
                     {

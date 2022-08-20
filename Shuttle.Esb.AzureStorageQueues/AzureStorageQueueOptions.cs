@@ -8,7 +8,8 @@ namespace Shuttle.Esb.AzureStorageQueues
         public const string SectionName = "Shuttle:ServiceBus:AzureStorageQueues";
 
         public string ConnectionString { get; set; }
-        public int MaxMessages { get; set; }
+        public int MaxMessages { get; set; } = 32;
+        public TimeSpan? VisibilityTimeout { get; set; }
 
         public event EventHandler<ConfigureEventArgs> Configure = delegate
         {
