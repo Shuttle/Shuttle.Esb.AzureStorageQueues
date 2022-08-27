@@ -5,7 +5,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueueOptions
     {
-        public const string SectionName = "Shuttle:ServiceBus:AzureStorageQueues";
+        public const string SectionName = "Shuttle:AzureStorageQueues";
 
         public string ConnectionString { get; set; }
         public int MaxMessages { get; set; } = 32;
