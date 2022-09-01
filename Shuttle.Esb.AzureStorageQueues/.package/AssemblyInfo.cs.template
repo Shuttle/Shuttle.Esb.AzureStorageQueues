@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("#{SemanticVersionCore}#.0")]
 [assembly: AssemblyCopyright("Copyright (c) #{Year}#, Eben Roux")]
-[assembly: AssemblyProduct("Shuttle.Esb.AzureMQ")]
+[assembly: AssemblyProduct("Shuttle.Esb.AzureStorageQueues")]
 [assembly: AssemblyCompany("Eben Roux")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyInformationalVersion("#{SemanticVersion}#")]

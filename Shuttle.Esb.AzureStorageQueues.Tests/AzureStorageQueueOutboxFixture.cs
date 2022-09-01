@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Shuttle.Esb.Tests;
 
-namespace Shuttle.Esb.AzureMQ.Tests
+namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
     public class AzureStorageQueueOutboxFixture : OutboxFixture
     {
@@ -9,7 +9,7 @@ namespace Shuttle.Esb.AzureMQ.Tests
         [TestCase(false)]
         public void Should_be_able_handle_errors(bool isTransactionalEndpoint)
         {
-            TestOutboxSending(AzureFixture.GetComponentContainer(), "azuremq://azure/{0}", isTransactionalEndpoint);
+            TestOutboxSending(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", 3, isTransactionalEndpoint);
         }
     }
 }

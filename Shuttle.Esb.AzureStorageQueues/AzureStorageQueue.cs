@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Shuttle.Core.Contract;
 using Shuttle.Core.Streams;
 
-namespace Shuttle.Esb.AzureMQ
+namespace Shuttle.Esb.AzureStorageQueues
 {
     public class AzureStorageQueue : IQueue, ICreateQueue, IDropQueue, IDisposable, IPurgeQueue
     {
@@ -24,24 +26,32 @@ namespace Shuttle.Esb.AzureMQ
             }
         }
 
-        private readonly Dictionary<string, AcknowledgementToken> _acknowledgementTokens = new Dictionary<string,AcknowledgementToken>();
+        private readonly AzureStorageQueueOptions _azureStorageQueueOptions;
+        private readonly CancellationToken _cancellationToken;
+        private readonly TimeSpan _infiniteTimeToLive = new TimeSpan(0, 0, -1);
+
+        private readonly Dictionary<string, AcknowledgementToken> _acknowledgementTokens = new Dictionary<string, AcknowledgementToken>();
         private readonly Queue<ReceivedMessage> _receivedMessages = new Queue<ReceivedMessage>();
         private readonly object _lock = new object();
 
         private readonly QueueClient _queueClient;
-        private readonly int _maxMessages;
 
-        public AzureStorageQueue(Uri uri, IAzureStorageConfiguration configuration)
+        public AzureStorageQueue(QueueUri uri, AzureStorageQueueOptions azureStorageQueueOptions, CancellationToken cancellationToken)
         {
             Guard.AgainstNull(uri, nameof(uri));
-            Guard.AgainstNull(configuration, nameof(configuration));
+            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
+
+            _cancellationToken = cancellationToken;
 
             Uri = uri;
 
-            var parser = new AzureStorageQueueUriParser(uri);
+            _azureStorageQueueOptions = azureStorageQueueOptions;
 
-            _queueClient = new QueueClient(configuration.GetConnectionString(parser.StorageConnectionStringName), parser.QueueName);
-            _maxMessages = parser.MaxMessages;
+            var queueClientOptions = new QueueClientOptions();
+
+            _azureStorageQueueOptions.OnConfigureConsumer(this, new ConfigureEventArgs(queueClientOptions));
+
+            _queueClient = new QueueClient(_azureStorageQueueOptions.ConnectionString, Uri.QueueName, queueClientOptions);
         }
 
         public bool IsEmpty()
@@ -57,7 +67,16 @@ namespace Shuttle.Esb.AzureMQ
             Guard.AgainstNull(message, nameof(message));
             Guard.AgainstNull(stream, nameof(stream));
 
-            _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()));
+            lock (_lock)
+            {
+                try
+                {
+                    _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()), null, _infiniteTimeToLive, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
         }
 
         public ReceivedMessage GetMessage()
@@ -66,7 +85,20 @@ namespace Shuttle.Esb.AzureMQ
             {
                 if (_receivedMessages.Count == 0)
                 {
-                    var messages = _queueClient.ReceiveMessages(_maxMessages);
+                    Response<QueueMessage[]> messages = null;
+
+                    try
+                    {
+                        messages = _queueClient.ReceiveMessages(_azureStorageQueueOptions.MaxMessages, _azureStorageQueueOptions.VisibilityTimeout, _cancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+
+                    if (messages == null)
+                    {
+                        return null;
+                    }
 
                     foreach (var message in messages.Value)
                     {
@@ -100,7 +132,13 @@ namespace Shuttle.Esb.AzureMQ
                     _acknowledgementTokens.Remove(data.MessageId);
                 }
 
-                _queueClient.DeleteMessage(data.MessageId, data.PopReceipt);
+                try
+                {
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -115,8 +153,14 @@ namespace Shuttle.Esb.AzureMQ
 
             lock (_lock)
             {
-                _queueClient.SendMessage(data.MessageText);
-                _queueClient.DeleteMessage(data.MessageId, data.PopReceipt);
+                try
+                {
+                    _queueClient.SendMessage(data.MessageText, _cancellationToken);
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
 
                 if (_acknowledgementTokens.ContainsKey(data.MessageId))
                 {
@@ -125,12 +169,20 @@ namespace Shuttle.Esb.AzureMQ
             }
         }
 
-        public Uri Uri { get; }
+        public QueueUri Uri { get; }
+        public bool IsStream => false;
+
         public void Create()
         {
             lock (_lock)
             {
-                _queueClient.CreateIfNotExists();
+                try
+                {
+                    _queueClient.CreateIfNotExists(null, _cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -138,7 +190,13 @@ namespace Shuttle.Esb.AzureMQ
         {
             lock (_lock)
             {
-                _queueClient.DeleteIfExists();
+                try
+                {
+                    _queueClient.DeleteIfExists(_cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
@@ -160,7 +218,13 @@ namespace Shuttle.Esb.AzureMQ
         {
             lock (_lock)
             {
-                _queueClient.ClearMessages();
+                try
+                {
+                    _queueClient.ClearMessages(_cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
     }

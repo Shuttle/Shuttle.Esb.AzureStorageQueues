@@ -1,59 +1,58 @@
 # Azure Storage Queues
 
 ```
-PM> Install-Package Shuttle.Esb.AzureMQ
+PM> Install-Package Shuttle.Esb.AzureStorageQueues
 ```
 
-In order to make use of the `AzureStorageQueue` you will need access to an Azure Storage account or [use the Azurite emulator for local Azure Storage development](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) for local development.
+In order to make use of the `AzureStorageQueue` you will need access to an Azure Storage account or use the [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) emulator for local Azure Storage development.
 
 You may want to take a look at how to [get started with Azure Queue storage using .NET](https://docs.microsoft.com/en-us/azure/storage/queues/storage-dotnet-how-to-use-queues?tabs=dotnet).
 
 ## Configuration
 
-The queue configuration is part of the specified uri, e.g.:
+The URI structure is `azuresq://configuration-name/queue-name`.
 
-``` xml
-<inbox
-    workQueueUri="azuremq://connection-name/queue-name?maxMessages=15"
-    .
-    .
-    .
-/>
+```c#
+services.AddAzureStorageQueues(builder =>
+{
+    var azureStorageQueueOptions = new AzureStorageQueueOptions
+    {
+        ConnectionString = "UseDevelopmentStorage=true",
+        MaxMessages = 20,
+        VisibilityTimeout = null
+    };
+
+    azureStorageQueueOptions.Configure += (sender, args) =>
+    {
+        Console.WriteLine($"[event] : Configure / Uri = '{((IQueue)sender).Uri}'");
+    };
+
+    builder.AddOptions("azure", azureStorageQueueOptions);
+});
 ```
+
+The `Configure` event `args` arugment exposes the `QueueClientOptions` directly for any specific options that need to be set.
+
+The default JSON settings structure is as follows:
+
+```json
+{
+  "Shuttle": {
+    "AzureStorageQueues": {
+      "azure": {
+        "ConnectionString": "UseDevelopmentStorage=true",
+        "MaxMessages": 32,
+        "VisibilityTimeout": "00:00:30"
+      }
+    }
+  }
+}
+```
+
+## Options
 
 | Segment / Argument | Default | Description |
 | --- | --- | --- | 
-| connection-name | required | Will be resolved by an `IAzureConfiguration` implementation (*see below*). |
-| queue-name | required | The name of queue to connect to. |
-| maxMessages | 1 | Specifies the number of messages to fetch from the queue. |
-
-## IAzureConfiguration
-
-```c#
-string GetConnectionString(string name);
-```
-
-The `GetConnectionString()` method should return the Azure Storage connection string to use.  For local `azurite` development this would be `UseDevelopmentStorage=true`.
-
-The relevant `IAzureConfiguration` should be registered with the `IComponentRegistry`:
-
-```c#
-IComponentResolver.Register<IAzureConfiguration, DefaultAzureConfiguration>;
-```
-
-## DefaultAzureConfiguration
-
-This implementation will return the `appSetting` value for the specified `connection-name` as the Azure Storage conenction string:
-
-```xml
-<appSettings>
-    <add key="azure" value="UseDevelopmentStorage=true" />
-</appSettings>
-
-<inbox
-    workQueueUri="azuremq://azure/server-inbox-work-queue"
-    .
-    .
-    .
-/>
-```
+| ConnectionString | | The Azure Storage Queue endpoint to connect to. |
+| MaxMessages | 32 | Specifies the number of messages to fetch from the queue. |
+| VisibilityTimeout | `null` | | The message visibility timeout that will be used for messages that fail processing. |
