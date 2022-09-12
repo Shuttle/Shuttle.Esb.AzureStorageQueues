@@ -17,14 +17,14 @@ namespace Shuttle.Esb.AzureStorageQueues
             Services = services;
         }
 
-        public AzureStorageQueueBuilder AddOptions(string name, AzureStorageQueueOptions amazonSqsOptions)
+        public AzureStorageQueueBuilder AddOptions(string name, AzureStorageQueueOptions azureStorageQueueOptions)
         {
             Guard.AgainstNullOrEmptyString(name, nameof(name));
-            Guard.AgainstNull(amazonSqsOptions, nameof(amazonSqsOptions));
+            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
 
             AzureStorageQueueOptions.Remove(name);
 
-            AzureStorageQueueOptions.Add(name, amazonSqsOptions);
+            AzureStorageQueueOptions.Add(name, azureStorageQueueOptions);
 
             return this;
         }
