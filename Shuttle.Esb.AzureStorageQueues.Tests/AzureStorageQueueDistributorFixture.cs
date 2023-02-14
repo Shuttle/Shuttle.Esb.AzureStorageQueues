@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Shuttle.Esb.Tests;
+using System.Threading.Tasks;
 
 namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
@@ -8,9 +9,9 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [Test]
         [TestCase(false)]
         [TestCase(true)]
-        public void Should_be_able_to_distribute_messages(bool isTransactionalEndpoint)
+        public async Task Should_be_able_to_distribute_messages(bool isTransactionalEndpoint)
         {
-            TestDistributor(AzureFixture.GetServiceCollection(), 
+            await TestDistributor(AzureFixture.GetServiceCollection(), 
                 AzureFixture.GetServiceCollection(), @"azuresq://azure/{0}", isTransactionalEndpoint);
         }
     }
