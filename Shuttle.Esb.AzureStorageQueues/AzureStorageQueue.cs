@@ -39,14 +39,10 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public AzureStorageQueue(QueueUri uri, AzureStorageQueueOptions azureStorageQueueOptions, CancellationToken cancellationToken)
         {
-            Guard.AgainstNull(uri, nameof(uri));
-            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
+            Uri = Guard.AgainstNull(uri, nameof(uri));
+            _azureStorageQueueOptions = Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
 
             _cancellationToken = cancellationToken;
-
-            Uri = uri;
-
-            _azureStorageQueueOptions = azureStorageQueueOptions;
 
             var queueClientOptions = new QueueClientOptions();
 
