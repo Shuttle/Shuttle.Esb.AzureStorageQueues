@@ -53,7 +53,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async ValueTask<bool> IsEmpty()
         {
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -70,7 +70,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             Guard.AgainstNull(message, nameof(message));
             Guard.AgainstNull(stream, nameof(stream));
 
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
