@@ -87,7 +87,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task<ReceivedMessage> GetMessage()
         {
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -132,7 +132,7 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             Guard.AgainstNull(acknowledgementToken, nameof(acknowledgementToken));
 
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -169,7 +169,7 @@ namespace Shuttle.Esb.AzureStorageQueues
                 return;
             }
 
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -198,7 +198,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task Create()
         {
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -218,7 +218,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task Drop()
         {
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
@@ -258,7 +258,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task Purge()
         {
-            await _lock.WaitAsync(CancellationToken.None);
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
