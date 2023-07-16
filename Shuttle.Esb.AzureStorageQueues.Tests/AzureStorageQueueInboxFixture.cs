@@ -20,7 +20,7 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [TestCase(250, true)]
         public async Task Should_be_able_to_process_messages_concurrently(int msToComplete, bool isTransactionalEndpoint)
         {
-            await TestInboxConcurrency(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", msToComplete, isTransactionalEndpoint, 5);
+            await TestInboxConcurrency(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", msToComplete, isTransactionalEndpoint);
         }
 
         [TestCase(100, true)]
