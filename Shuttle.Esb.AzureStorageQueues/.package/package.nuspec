@@ -15,7 +15,7 @@
 		<copyright>Copyright (c) 2023, Eben Roux</copyright>
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
-      <dependency id="Azure.Storage.Queues" version="12.13.0" />
+      <dependency id="Azure.Storage.Queues" version="12.15.0" />
       <dependency id="Shuttle.Esb" version="14.0.0" />
 		</dependencies>
 	</metadata>
