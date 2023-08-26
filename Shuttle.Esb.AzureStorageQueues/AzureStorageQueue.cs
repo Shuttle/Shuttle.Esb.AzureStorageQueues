@@ -39,6 +39,8 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task Create()
         {
+            OperationStarting.Invoke(this, new OperationEventArgs("Create"));
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
@@ -55,6 +57,8 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 _lock.Release();
             }
+
+            OperationCompleted.Invoke(this, new OperationEventArgs("Create"));
         }
 
         public void Dispose()
@@ -79,6 +83,8 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public async Task Drop()
         {
+            OperationStarting.Invoke(this, new OperationEventArgs("Drop"));
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
@@ -95,10 +101,14 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 _lock.Release();
             }
+
+            OperationCompleted.Invoke(this, new OperationEventArgs("Drop"));
         }
 
         public async Task Purge()
         {
+            OperationStarting.Invoke(this, new OperationEventArgs("Purge"));
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
@@ -115,6 +125,8 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 _lock.Release();
             }
+
+            OperationCompleted.Invoke(this, new OperationEventArgs("Purge"));
         }
 
         public event EventHandler<MessageEnqueuedEventArgs> MessageEnqueued = delegate
@@ -133,19 +145,25 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
         };
 
-        public event EventHandler<OperationCompletedEventArgs> OperationCompleted = delegate
+        public event EventHandler<OperationEventArgs> OperationStarting = delegate
+        {
+        };
+
+        public event EventHandler<OperationEventArgs> OperationCompleted = delegate
         {
         };
 
         public async ValueTask<bool> IsEmpty()
         {
+            OperationStarting.Invoke(this, new OperationEventArgs("IsEmpty"));
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
                 var result = ((QueueProperties)await _queueClient.GetPropertiesAsync(_cancellationToken).ConfigureAwait(false)).ApproximateMessagesCount == 0;
 
-                OperationCompleted.Invoke(this, new OperationCompletedEventArgs("IsEmpty", result));
+                OperationCompleted.Invoke(this, new OperationEventArgs("IsEmpty", result));
 
                 return result;
             }
