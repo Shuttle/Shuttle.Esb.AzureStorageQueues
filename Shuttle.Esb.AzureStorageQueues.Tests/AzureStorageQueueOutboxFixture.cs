@@ -8,9 +8,16 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
     {
         [TestCase(true)]
         [TestCase(false)]
-        public async Task Should_be_able_to_use_outbox(bool isTransactionalEndpoint)
+        public void Should_be_able_to_use_outbox(bool isTransactionalEndpoint)
         {
-            await TestOutboxSending(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}", 3, isTransactionalEndpoint);
+            TestOutboxSending(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}", 3, isTransactionalEndpoint);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Should_be_able_to_use_outbox_async(bool isTransactionalEndpoint)
+        {
+            await TestOutboxSendingAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}", 3, isTransactionalEndpoint);
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Shuttle.Core.Pipelines;
-using Shuttle.Esb.Logging;
 
 namespace Shuttle.Esb.AzureStorageQueues.Tests
 {
-    public static class AzureFixture
+    public static class AzureStorageQueueConfiguration
     {
         public static IServiceCollection GetServiceCollection()
         {

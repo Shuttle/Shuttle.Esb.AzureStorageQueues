@@ -9,10 +9,17 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [Test]
         [TestCase(false)]
         [TestCase(true)]
-        public async Task Should_be_able_to_distribute_messages(bool isTransactionalEndpoint)
+        public void Should_be_able_to_distribute_messages(bool isTransactionalEndpoint)
         {
-            await TestDistributor(AzureFixture.GetServiceCollection(), 
-                AzureFixture.GetServiceCollection(), @"azuresq://azure/{0}", isTransactionalEndpoint);
+            TestDistributor(AzureStorageQueueConfiguration.GetServiceCollection(), AzureStorageQueueConfiguration.GetServiceCollection(), @"azuresq://azure/{0}", isTransactionalEndpoint);
+        }
+
+        [Test]
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Should_be_able_to_distribute_messages_async(bool isTransactionalEndpoint)
+        {
+            await TestDistributorAsync(AzureStorageQueueConfiguration.GetServiceCollection(), AzureStorageQueueConfiguration.GetServiceCollection(), @"azuresq://azure/{0}", isTransactionalEndpoint);
         }
     }
 }

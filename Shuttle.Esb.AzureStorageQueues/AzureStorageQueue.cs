@@ -37,30 +37,6 @@ namespace Shuttle.Esb.AzureStorageQueues
             _queueClient = new QueueClient(_azureStorageQueueOptions.ConnectionString, Uri.QueueName, queueClientOptions);
         }
 
-        public async Task Create()
-        {
-            OperationStarting.Invoke(this, new OperationEventArgs("Create"));
-
-            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
-
-            try
-            {
-                try
-                {
-                    await _queueClient.CreateIfNotExistsAsync(null, _cancellationToken);
-                }
-                catch (OperationCanceledException)
-                {
-                }
-            }
-            finally
-            {
-                _lock.Release();
-            }
-
-            OperationCompleted.Invoke(this, new OperationEventArgs("Create"));
-        }
-
         public void Dispose()
         {
             _lock.Wait(CancellationToken.None);
@@ -81,9 +57,110 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
-        public async Task Drop()
+        public event EventHandler<MessageEnqueuedEventArgs> MessageEnqueued;
+        public event EventHandler<MessageAcknowledgedEventArgs> MessageAcknowledged;
+        public event EventHandler<MessageReleasedEventArgs> MessageReleased;
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<OperationEventArgs> Operation;
+
+        public bool IsEmpty()
         {
-            OperationStarting.Invoke(this, new OperationEventArgs("Drop"));
+            return IsEmptyAsync(true).GetAwaiter().GetResult();
+        }
+
+        public async ValueTask<bool> IsEmptyAsync()
+        {
+            return await IsEmptyAsync(false).ConfigureAwait(false);
+        }
+
+        public void Enqueue(TransportMessage transportMessage, Stream stream)
+        {
+            EnqueueAsync(transportMessage, stream, true).GetAwaiter().GetResult();
+        }
+
+        public async Task EnqueueAsync(TransportMessage transportMessage, Stream stream)
+        {
+            await EnqueueAsync(transportMessage, stream, false).ConfigureAwait(false);
+        }
+
+        public ReceivedMessage GetMessage()
+        {
+            return GetMessageAsync(true).GetAwaiter().GetResult();
+        }
+
+        public async Task<ReceivedMessage> GetMessageAsync()
+        {
+            return await GetMessageAsync(false).ConfigureAwait(false);
+        }
+
+        public void Acknowledge(object acknowledgementToken)
+        {
+            AcknowledgeAsync(acknowledgementToken, true).GetAwaiter().GetResult();
+        }
+
+        public async Task AcknowledgeAsync(object acknowledgementToken)
+        {
+            await AcknowledgeAsync(acknowledgementToken, false).ConfigureAwait(false);
+        }
+
+        public void Release(object acknowledgementToken)
+        {
+            ReleaseAsync(acknowledgementToken, true).GetAwaiter().GetResult();
+        }
+
+        public async Task ReleaseAsync(object acknowledgementToken)
+        {
+            await ReleaseAsync(acknowledgementToken, false).ConfigureAwait(false);
+        }
+
+        public QueueUri Uri { get; }
+        public bool IsStream => false;
+
+        private async Task AcknowledgeAsync(object acknowledgementToken, bool sync)
+        {
+            Guard.AgainstNull(acknowledgementToken, nameof(acknowledgementToken));
+
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
+
+            try
+            {
+                if (!(acknowledgementToken is AcknowledgementToken data))
+                {
+                    return;
+                }
+
+                try
+                {
+                    if (sync)
+                    {
+                        _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                    }
+                    else
+                    {
+                        await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
+                    }
+
+                    if (_acknowledgementTokens.ContainsKey(data.MessageId))
+                    {
+                        _acknowledgementTokens.Remove(data.MessageId);
+                    }
+
+                    MessageAcknowledged?.Invoke(this, new MessageAcknowledgedEventArgs(acknowledgementToken));
+                }
+                catch (OperationCanceledException)
+                {
+                    Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]"));
+                }
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
+        private async Task CreateAsync(bool sync)
+        {
+            Operation?.Invoke(this, new OperationEventArgs("[create/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -91,10 +168,18 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 try
                 {
-                    await _queueClient.DeleteIfExistsAsync(_cancellationToken).ConfigureAwait(false);
+                    if (sync)
+                    {
+                        _queueClient.CreateIfNotExists(null, _cancellationToken);
+                    }
+                    else
+                    {
+                        await _queueClient.CreateIfNotExistsAsync(null, _cancellationToken).ConfigureAwait(false);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
+                    Operation?.Invoke(this, new OperationEventArgs("[create/cancelled]"));
                 }
             }
             finally
@@ -102,12 +187,12 @@ namespace Shuttle.Esb.AzureStorageQueues
                 _lock.Release();
             }
 
-            OperationCompleted.Invoke(this, new OperationEventArgs("Drop"));
+            Operation?.Invoke(this, new OperationEventArgs("[create/completed]"));
         }
 
-        public async Task Purge()
+        private async Task DropAsync(bool sync)
         {
-            OperationStarting.Invoke(this, new OperationEventArgs("Purge"));
+            Operation?.Invoke(this, new OperationEventArgs("[drop/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -115,10 +200,18 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 try
                 {
-                    await _queueClient.ClearMessagesAsync(_cancellationToken).ConfigureAwait(false);
+                    if (sync)
+                    {
+                        _queueClient.DeleteIfExists(_cancellationToken);
+                    }
+                    else
+                    {
+                        await _queueClient.DeleteIfExistsAsync(_cancellationToken).ConfigureAwait(false);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
+                    Operation?.Invoke(this, new OperationEventArgs("[drop/cancelled]"));
                 }
             }
             finally
@@ -126,54 +219,10 @@ namespace Shuttle.Esb.AzureStorageQueues
                 _lock.Release();
             }
 
-            OperationCompleted.Invoke(this, new OperationEventArgs("Purge"));
+            Operation?.Invoke(this, new OperationEventArgs("[drop/completed]"));
         }
 
-        public event EventHandler<MessageEnqueuedEventArgs> MessageEnqueued = delegate
-        {
-        };
-
-        public event EventHandler<MessageAcknowledgedEventArgs> MessageAcknowledged = delegate
-        {
-        };
-
-        public event EventHandler<MessageReleasedEventArgs> MessageReleased = delegate
-        {
-        };
-
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived = delegate
-        {
-        };
-
-        public event EventHandler<OperationEventArgs> OperationStarting = delegate
-        {
-        };
-
-        public event EventHandler<OperationEventArgs> OperationCompleted = delegate
-        {
-        };
-
-        public async ValueTask<bool> IsEmpty()
-        {
-            OperationStarting.Invoke(this, new OperationEventArgs("IsEmpty"));
-
-            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
-
-            try
-            {
-                var result = ((QueueProperties)await _queueClient.GetPropertiesAsync(_cancellationToken).ConfigureAwait(false)).ApproximateMessagesCount == 0;
-
-                OperationCompleted.Invoke(this, new OperationEventArgs("IsEmpty", result));
-
-                return result;
-            }
-            finally
-            {
-                _lock.Release();
-            }
-        }
-
-        public async Task Enqueue(TransportMessage message, Stream stream)
+        private async Task EnqueueAsync(TransportMessage message, Stream stream, bool sync)
         {
             Guard.AgainstNull(message, nameof(message));
             Guard.AgainstNull(stream, nameof(stream));
@@ -182,12 +231,20 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             try
             {
-                await _queueClient.SendMessageAsync(Convert.ToBase64String(await stream.ToBytesAsync().ConfigureAwait(false)), null, _infiniteTimeToLive, _cancellationToken).ConfigureAwait(false);
+                if (sync)
+                {
+                    _queueClient.SendMessage(Convert.ToBase64String(stream.ToBytes()), null, _infiniteTimeToLive, _cancellationToken);
+                }
+                else
+                {
+                    await _queueClient.SendMessageAsync(Convert.ToBase64String(await stream.ToBytesAsync().ConfigureAwait(false)), null, _infiniteTimeToLive, _cancellationToken).ConfigureAwait(false);
+                }
 
-                MessageEnqueued.Invoke(this, new MessageEnqueuedEventArgs(message, stream));
+                MessageEnqueued?.Invoke(this, new MessageEnqueuedEventArgs(message, stream));
             }
             catch (OperationCanceledException)
             {
+                Operation?.Invoke(this, new OperationEventArgs("[enqueue/cancelled]"));
             }
             finally
             {
@@ -195,7 +252,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
-        public async Task<ReceivedMessage> GetMessage()
+        private async Task<ReceivedMessage> GetMessageAsync(bool sync)
         {
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -207,10 +264,13 @@ namespace Shuttle.Esb.AzureStorageQueues
 
                     try
                     {
-                        messages = await _queueClient.ReceiveMessagesAsync(_azureStorageQueueOptions.MaxMessages, _azureStorageQueueOptions.VisibilityTimeout, _cancellationToken).ConfigureAwait(false);
+                        messages = sync
+                            ? _queueClient.ReceiveMessages(_azureStorageQueueOptions.MaxMessages, _azureStorageQueueOptions.VisibilityTimeout, _cancellationToken)
+                            : await _queueClient.ReceiveMessagesAsync(_azureStorageQueueOptions.MaxMessages, _azureStorageQueueOptions.VisibilityTimeout, _cancellationToken).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
+                        Operation?.Invoke(this, new OperationEventArgs("[get-message/cancelled]"));
                     }
 
                     if (messages == null)
@@ -234,7 +294,7 @@ namespace Shuttle.Esb.AzureStorageQueues
 
                 if (receivedMessage != null)
                 {
-                    MessageReceived.Invoke(this, new MessageReceivedEventArgs(receivedMessage));
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(receivedMessage));
                 }
 
                 return receivedMessage;
@@ -245,41 +305,67 @@ namespace Shuttle.Esb.AzureStorageQueues
             }
         }
 
-        public async Task Acknowledge(object acknowledgementToken)
+        private async ValueTask<bool> IsEmptyAsync(bool sync)
         {
-            Guard.AgainstNull(acknowledgementToken, nameof(acknowledgementToken));
+            Operation?.Invoke(this, new OperationEventArgs("[is-empty/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
             {
-                if (!(acknowledgementToken is AcknowledgementToken data))
-                {
-                    return;
-                }
+                var result = sync
+                    ? ((QueueProperties)_queueClient.GetProperties(_cancellationToken)).ApproximateMessagesCount == 0
+                    : ((QueueProperties)await _queueClient.GetPropertiesAsync(_cancellationToken).ConfigureAwait(false)).ApproximateMessagesCount == 0;
 
-                if (_acknowledgementTokens.ContainsKey(data.MessageId))
-                {
-                    _acknowledgementTokens.Remove(data.MessageId);
-                }
+                Operation?.Invoke(this, new OperationEventArgs("IsEmpty", result));
 
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[is-empty/cancelled]"));
+            }
+            finally
+            {
+                _lock.Release();
+            }
+
+            return true;
+        }
+
+        private async Task PurgeAsync(bool sync)
+        {
+            Operation?.Invoke(this, new OperationEventArgs("[purge/starting]"));
+
+            await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
+
+            try
+            {
                 try
                 {
-                    await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
-
-                    MessageAcknowledged.Invoke(this, new MessageAcknowledgedEventArgs(acknowledgementToken));
+                    if (sync)
+                    {
+                        _queueClient.ClearMessages(_cancellationToken);
+                    }
+                    else
+                    {
+                        await _queueClient.ClearMessagesAsync(_cancellationToken).ConfigureAwait(false);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
+                    Operation?.Invoke(this, new OperationEventArgs("[purge/cancelled]"));
                 }
             }
             finally
             {
                 _lock.Release();
             }
+
+            Operation?.Invoke(this, new OperationEventArgs("[purge/completed]"));
         }
 
-        public async Task Release(object acknowledgementToken)
+        private async Task ReleaseAsync(object acknowledgementToken, bool sync)
         {
             Guard.AgainstNull(acknowledgementToken, nameof(acknowledgementToken));
 
@@ -292,13 +378,22 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             try
             {
-                await _queueClient.SendMessageAsync(data.MessageText, _cancellationToken).ConfigureAwait(false);
-                await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
+                if (sync)
+                {
+                    _queueClient.SendMessage(data.MessageText, _cancellationToken);
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                else
+                {
+                    await _queueClient.SendMessageAsync(data.MessageText, _cancellationToken).ConfigureAwait(false);
+                    await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
+                }
 
-                MessageReleased.Invoke(this, new MessageReleasedEventArgs(acknowledgementToken));
+                MessageReleased?.Invoke(this, new MessageReleasedEventArgs(acknowledgementToken));
             }
             catch (OperationCanceledException)
             {
+                Operation?.Invoke(this, new OperationEventArgs("[release/cancelled]"));
             }
             finally
             {
@@ -310,9 +405,6 @@ namespace Shuttle.Esb.AzureStorageQueues
                 _acknowledgementTokens.Remove(data.MessageId);
             }
         }
-
-        public QueueUri Uri { get; }
-        public bool IsStream => false;
 
         internal class AcknowledgementToken
         {
@@ -326,6 +418,36 @@ namespace Shuttle.Esb.AzureStorageQueues
             public string MessageId { get; }
             public string MessageText { get; }
             public string PopReceipt { get; }
+        }
+
+        public void Create()
+        {
+            CreateAsync(true).GetAwaiter().GetResult();
+        }
+
+        public async Task CreateAsync()
+        {
+            await CreateAsync(false).ConfigureAwait(false);
+        }
+
+        public void Drop()
+        {
+            DropAsync(true).GetAwaiter().GetResult();
+        }
+
+        public async Task DropAsync()
+        {
+            await DropAsync(false).ConfigureAwait(false);
+        }
+
+        public void Purge()
+        {
+            PurgeAsync(true).GetAwaiter().GetResult();
+        }
+
+        public async Task PurgeAsync()
+        {
+            await PurgeAsync(false).ConfigureAwait(false);
         }
     }
 }
