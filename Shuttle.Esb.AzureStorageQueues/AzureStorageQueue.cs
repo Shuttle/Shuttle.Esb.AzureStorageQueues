@@ -122,39 +122,36 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
+            if (!(acknowledgementToken is AcknowledgementToken data))
+            {
+                return;
+            }
+
             try
             {
-                if (!(acknowledgementToken is AcknowledgementToken data))
+                if (sync)
                 {
-                    return;
+                    _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
+                }
+                else
+                {
+                    await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
                 }
 
-                try
-                {
-                    if (sync)
-                    {
-                        _queueClient.DeleteMessage(data.MessageId, data.PopReceipt, _cancellationToken);
-                    }
-                    else
-                    {
-                        await _queueClient.DeleteMessageAsync(data.MessageId, data.PopReceipt, _cancellationToken).ConfigureAwait(false);
-                    }
-
-                    if (_acknowledgementTokens.ContainsKey(data.MessageId))
-                    {
-                        _acknowledgementTokens.Remove(data.MessageId);
-                    }
-
-                    MessageAcknowledged?.Invoke(this, new MessageAcknowledgedEventArgs(acknowledgementToken));
-                }
-                catch (OperationCanceledException)
-                {
-                    Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]"));
-                }
+                MessageAcknowledged?.Invoke(this, new MessageAcknowledgedEventArgs(acknowledgementToken));
+            }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]"));
             }
             finally
             {
                 _lock.Release();
+            }
+
+            if (_acknowledgementTokens.ContainsKey(data.MessageId))
+            {
+                _acknowledgementTokens.Remove(data.MessageId);
             }
         }
 
