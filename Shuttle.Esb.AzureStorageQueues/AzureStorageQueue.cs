@@ -120,6 +120,12 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             Guard.AgainstNull(acknowledgementToken, nameof(acknowledgementToken));
 
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]"));
+                return;
+            }
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             if (!(acknowledgementToken is AcknowledgementToken data))
@@ -236,6 +242,12 @@ namespace Shuttle.Esb.AzureStorageQueues
             Guard.AgainstNull(message, nameof(message));
             Guard.AgainstNull(stream, nameof(stream));
 
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[enqueue/cancelled]"));
+                return;
+            }
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
@@ -263,6 +275,12 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         private async Task<ReceivedMessage> GetMessageAsync(bool sync)
         {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[enqueue/cancelled]"));
+                return null;
+            }
+
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
             try
@@ -308,14 +326,26 @@ namespace Shuttle.Esb.AzureStorageQueues
 
                 return receivedMessage;
             }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[get-message/cancelled]"));
+            }
             finally
             {
                 _lock.Release();
             }
+
+            return null;
         }
 
         private async ValueTask<bool> IsEmptyAsync(bool sync)
         {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]", true));
+                return true;
+            }
+
             Operation?.Invoke(this, new OperationEventArgs("[is-empty/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
@@ -326,13 +356,13 @@ namespace Shuttle.Esb.AzureStorageQueues
                     ? ((QueueProperties)_queueClient.GetProperties(_cancellationToken)).ApproximateMessagesCount == 0
                     : ((QueueProperties)await _queueClient.GetPropertiesAsync(_cancellationToken).ConfigureAwait(false)).ApproximateMessagesCount == 0;
 
-                Operation?.Invoke(this, new OperationEventArgs("IsEmpty", result));
+                Operation?.Invoke(this, new OperationEventArgs("[is-empty]", result));
 
                 return result;
             }
             catch (OperationCanceledException)
             {
-                Operation?.Invoke(this, new OperationEventArgs("[is-empty/cancelled]"));
+                Operation?.Invoke(this, new OperationEventArgs("[is-empty/cancelled]", true));
             }
             finally
             {
@@ -386,6 +416,12 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             if (!(acknowledgementToken is AcknowledgementToken data))
             {
+                return;
+            }
+
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[release/cancelled]"));
                 return;
             }
 
