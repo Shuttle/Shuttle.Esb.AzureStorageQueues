@@ -12,10 +12,10 @@
 		<readme>docs\README.md</readme>
 		<repository type="git" url="https://github.com/Shuttle/Shuttle.Esb.AzureStorageQueues.git" />
 		<description>Azure Storage Queue implementation for use with Shuttle.Esb.</description>
-		<copyright>Copyright (c) 2023, Eben Roux</copyright>
+		<copyright>Copyright (c) 2024, Eben Roux</copyright>
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
-      <dependency id="Azure.Storage.Queues" version="12.15.0" />
+      <dependency id="Azure.Storage.Queues" version="12.17.1" />
       <dependency id="Shuttle.Esb" version="14.0.0" />
 		</dependencies>
 	</metadata>
