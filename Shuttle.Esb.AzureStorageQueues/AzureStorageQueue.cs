@@ -157,6 +157,12 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         private async Task CreateAsync(bool sync)
         {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[create/cancelled]"));
+                return;
+            }
+
             Operation?.Invoke(this, new OperationEventArgs("[create/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
@@ -189,6 +195,12 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         private async Task DropAsync(bool sync)
         {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[drop/cancelled]"));
+                return;
+            }
+
             Operation?.Invoke(this, new OperationEventArgs("[drop/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
@@ -332,6 +344,12 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         private async Task PurgeAsync(bool sync)
         {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[purge/cancelled]"));
+                return;
+            }
+
             Operation?.Invoke(this, new OperationEventArgs("[purge/starting]"));
 
             await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
