@@ -342,7 +342,7 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             if (_cancellationToken.IsCancellationRequested)
             {
-                Operation?.Invoke(this, new OperationEventArgs("[acknowledge/cancelled]", true));
+                Operation?.Invoke(this, new OperationEventArgs("[is-empty/cancelled]", true));
                 return true;
             }
 
@@ -386,21 +386,18 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             try
             {
-                try
+                if (sync)
                 {
-                    if (sync)
-                    {
-                        _queueClient.ClearMessages(_cancellationToken);
-                    }
-                    else
-                    {
-                        await _queueClient.ClearMessagesAsync(_cancellationToken).ConfigureAwait(false);
-                    }
+                    _queueClient.ClearMessages(_cancellationToken);
                 }
-                catch (OperationCanceledException)
+                else
                 {
-                    Operation?.Invoke(this, new OperationEventArgs("[purge/cancelled]"));
+                    await _queueClient.ClearMessagesAsync(_cancellationToken).ConfigureAwait(false);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[purge/cancelled]"));
             }
             finally
             {
