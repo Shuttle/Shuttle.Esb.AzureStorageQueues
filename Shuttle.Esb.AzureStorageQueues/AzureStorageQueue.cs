@@ -175,21 +175,18 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             try
             {
-                try
+                if (sync)
                 {
-                    if (sync)
-                    {
-                        _queueClient.CreateIfNotExists(null, _cancellationToken);
-                    }
-                    else
-                    {
-                        await _queueClient.CreateIfNotExistsAsync(null, _cancellationToken).ConfigureAwait(false);
-                    }
+                    _queueClient.CreateIfNotExists(null, _cancellationToken);
                 }
-                catch (OperationCanceledException)
+                else
                 {
-                    Operation?.Invoke(this, new OperationEventArgs("[create/cancelled]"));
+                    await _queueClient.CreateIfNotExistsAsync(null, _cancellationToken).ConfigureAwait(false);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[create/cancelled]"));
             }
             finally
             {
@@ -213,21 +210,18 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             try
             {
-                try
+                if (sync)
                 {
-                    if (sync)
-                    {
-                        _queueClient.DeleteIfExists(_cancellationToken);
-                    }
-                    else
-                    {
-                        await _queueClient.DeleteIfExistsAsync(_cancellationToken).ConfigureAwait(false);
-                    }
+                    _queueClient.DeleteIfExists(_cancellationToken);
                 }
-                catch (OperationCanceledException)
+                else
                 {
-                    Operation?.Invoke(this, new OperationEventArgs("[drop/cancelled]"));
+                    await _queueClient.DeleteIfExistsAsync(_cancellationToken).ConfigureAwait(false);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Operation?.Invoke(this, new OperationEventArgs("[drop/cancelled]"));
             }
             finally
             {
@@ -277,7 +271,7 @@ namespace Shuttle.Esb.AzureStorageQueues
         {
             if (_cancellationToken.IsCancellationRequested)
             {
-                Operation?.Invoke(this, new OperationEventArgs("[enqueue/cancelled]"));
+                Operation?.Invoke(this, new OperationEventArgs("[get-message/cancelled]"));
                 return null;
             }
 
