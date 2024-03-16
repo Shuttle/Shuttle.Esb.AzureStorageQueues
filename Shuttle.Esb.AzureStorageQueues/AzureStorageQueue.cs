@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Identity;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Shuttle.Core.Contract;
@@ -34,7 +35,20 @@ namespace Shuttle.Esb.AzureStorageQueues
 
             _azureStorageQueueOptions.OnConfigureConsumer(this, new ConfigureEventArgs(queueClientOptions));
 
-            _queueClient = new QueueClient(_azureStorageQueueOptions.ConnectionString, Uri.QueueName, queueClientOptions);
+            if (!string.IsNullOrWhiteSpace(_azureStorageQueueOptions.ConnectionString))
+            {
+                _queueClient = new QueueClient(_azureStorageQueueOptions.ConnectionString, Uri.QueueName, queueClientOptions);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_azureStorageQueueOptions.StorageAccount))
+            {
+                _queueClient = new QueueClient(new Uri($"https://{_azureStorageQueueOptions.StorageAccount}.queue.core.windows.net/{Uri.QueueName}"), new DefaultAzureCredential());
+            }
+
+            if (_queueClient == null)
+            {
+                throw new InvalidOperationException(string.Format(Resources.QueueUriException, uri.ConfigurationName));
+            }
         }
 
         public void Dispose()

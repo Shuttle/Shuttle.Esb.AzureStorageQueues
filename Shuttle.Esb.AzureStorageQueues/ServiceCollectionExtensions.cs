@@ -22,6 +22,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 services.AddOptions<AzureStorageQueueOptions>(pair.Key).Configure(options =>
                 {
+                    options.StorageAccount = pair.Value.StorageAccount;
                     options.ConnectionString = pair.Value.ConnectionString;
                     options.MaxMessages = pair.Value.MaxMessages;
 
