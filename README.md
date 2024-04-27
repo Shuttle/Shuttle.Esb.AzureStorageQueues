@@ -12,11 +12,14 @@ You may want to take a look at how to [get started with Azure Queue storage usin
 
 The URI structure is `azuresq://configuration-name/queue-name`.
 
+If `ConnectionString` is specified the `StorageAccount` setting will be ignored.  Well `StorageAccount` is specified the `DefaultAzureCredential` will be used to authenticate.
+
 ```c#
 services.AddAzureStorageQueues(builder =>
 {
     var azureStorageQueueOptions = new AzureStorageQueueOptions
     {
+        StorageAccount = "devstoreaccount1",
         ConnectionString = "UseDevelopmentStorage=true",
         MaxMessages = 20,
         VisibilityTimeout = null
@@ -40,6 +43,7 @@ The default JSON settings structure is as follows:
   "Shuttle": {
     "AzureStorageQueues": {
       "azure": {
+        "StorageAccount": "devstoreaccount1",
         "ConnectionString": "UseDevelopmentStorage=true",
         "MaxMessages": 32,
         "VisibilityTimeout": "00:00:30"
@@ -53,6 +57,7 @@ The default JSON settings structure is as follows:
 
 | Segment / Argument | Default | Description |
 | --- | --- | --- | 
-| ConnectionString | | The Azure Storage Queue endpoint to connect to. |
-| MaxMessages | 32 | Specifies the number of messages to fetch from the queue. |
-| VisibilityTimeout | `null` | | The message visibility timeout that will be used for messages that fail processing. |
+| `StorageAccount` | | The name of the storage. |
+| `ConnectionString` | | The Azure Storage Queue endpoint to connect to. |
+| `MaxMessages` | `32` | Specifies the number of messages to fetch from the queue. |
+| `VisibilityTimeout` | `null` | | The message visibility timeout that will be used for messages that fail processing. |
