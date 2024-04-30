@@ -11,9 +11,10 @@ namespace Shuttle.Esb.AzureStorageQueues
                 return ValidateOptionsResult.Fail(Esb.Resources.QueueConfigurationNameException);
             }
 
-            if (string.IsNullOrWhiteSpace(options.ConnectionString))
+            if (string.IsNullOrWhiteSpace(options.ConnectionString) &&
+                string.IsNullOrWhiteSpace(options.StorageAccount))
             {
-                return ValidateOptionsResult.Fail(string.Format(Resources.QueueConfigurationItemException, name, nameof(options.ConnectionString)));
+                return ValidateOptionsResult.Fail(string.Format(Resources.QueueUriException, name, nameof(options.ConnectionString)));
             }
 
             return ValidateOptionsResult.Success;

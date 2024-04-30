@@ -13,18 +13,13 @@ namespace Shuttle.Esb.AzureStorageQueues
 
         public AzureStorageQueueFactory(IOptionsMonitor<AzureStorageQueueOptions> azureStorageQueueOptions, ICancellationTokenSource cancellationTokenSource)
         {
-            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
-            Guard.AgainstNull(cancellationTokenSource, nameof(cancellationTokenSource));
-
-            _azureStorageQueueOptions = azureStorageQueueOptions;
-            _cancellationTokenSource = cancellationTokenSource;
+            _azureStorageQueueOptions = Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
+            _cancellationTokenSource = Guard.AgainstNull(cancellationTokenSource, nameof(cancellationTokenSource));
         }
 
         public IQueue Create(Uri uri)
         {
-            Guard.AgainstNull(uri, "uri");
-
-            var queueUri = new QueueUri(uri).SchemeInvariant(Scheme);
+            var queueUri = new QueueUri(Guard.AgainstNull(uri, nameof(uri))).SchemeInvariant(Scheme);
             var azureStorageQueueOptions = _azureStorageQueueOptions.Get(queueUri.ConfigurationName);
 
             if (azureStorageQueueOptions == null)

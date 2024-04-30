@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -23,6 +22,7 @@ namespace Shuttle.Esb.AzureStorageQueues
             {
                 services.AddOptions<AzureStorageQueueOptions>(pair.Key).Configure(options =>
                 {
+                    options.StorageAccount = pair.Value.StorageAccount;
                     options.ConnectionString = pair.Value.ConnectionString;
                     options.MaxMessages = pair.Value.MaxMessages;
 

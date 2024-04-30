@@ -7,20 +7,19 @@ namespace Shuttle.Esb.AzureStorageQueues
     {
         public const string SectionName = "Shuttle:AzureStorageQueues";
 
+        public string StorageAccount { get; set; }
         public string ConnectionString { get; set; }
         public int MaxMessages { get; set; } = 32;
         public TimeSpan? VisibilityTimeout { get; set; }
 
-        public event EventHandler<ConfigureEventArgs> Configure = delegate
-        {
-        };
-
+        public event EventHandler<ConfigureEventArgs> Configure;
+        
         public void OnConfigureConsumer(object sender, ConfigureEventArgs args)
         {
             Guard.AgainstNull(sender, nameof(sender));
             Guard.AgainstNull(args, nameof(args));
 
-            Configure.Invoke(sender, args);
+            Configure?.Invoke(sender, args);
         }
     }
 }

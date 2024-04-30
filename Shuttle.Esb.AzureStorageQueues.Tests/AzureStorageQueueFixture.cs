@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Shuttle.Esb.Tests;
 
@@ -9,20 +10,39 @@ namespace Shuttle.Esb.AzureStorageQueues.Tests
         [Test]
         public void Should_be_able_to_perform_simple_enqueue_and_get_message()
         {
-            TestSimpleEnqueueAndGetMessage(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}");
-            TestSimpleEnqueueAndGetMessage(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}-transient");
+            TestSimpleEnqueueAndGetMessage(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
+            TestSimpleEnqueueAndGetMessage(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}-transient");
+        }
+
+        [Test]
+        public async Task Should_be_able_to_perform_simple_enqueue_and_get_message_async()
+        {
+            await TestSimpleEnqueueAndGetMessageAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
+            await TestSimpleEnqueueAndGetMessageAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}-transient");
         }
 
         [Test]
         public void Should_be_able_to_release_a_message()
         {
-            TestReleaseMessage(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}");
+            TestReleaseMessage(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
+        }
+
+        [Test]
+        public async Task Should_be_able_to_release_a_message_async()
+        {
+            await TestReleaseMessageAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
         }
 
         [Test]
         public void Should_be_able_to_get_message_again_when_not_acknowledged_before_queue_is_disposed()
         {
-            TestUnacknowledgedMessage(AzureFixture.GetServiceCollection(), "azuresq://azure/{0}");
+            TestUnacknowledgedMessage(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
+        }
+
+        [Test]
+        public async Task Should_be_able_to_get_message_again_when_not_acknowledged_before_queue_is_disposed_async()
+        {
+            await TestUnacknowledgedMessageAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
         }
     }
 }
