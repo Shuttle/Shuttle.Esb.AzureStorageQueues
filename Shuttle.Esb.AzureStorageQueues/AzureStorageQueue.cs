@@ -308,7 +308,7 @@ namespace Shuttle.Esb.AzureStorageQueues
                         Operation?.Invoke(this, new OperationEventArgs("[get-message/cancelled]"));
                     }
 
-                    if (messages == null)
+                    if (messages == null || messages.Value.Length == 0)
                     {
                         return null;
                     }
@@ -317,11 +317,14 @@ namespace Shuttle.Esb.AzureStorageQueues
                     {
                         var acknowledgementToken = new AcknowledgementToken(message.MessageId, message.MessageText, message.PopReceipt);
 
+                        if (_acknowledgementTokens.Remove(acknowledgementToken.MessageId))
+                        {
+                            Operation?.Invoke(this, new OperationEventArgs("[get-message/refreshed]", acknowledgementToken.MessageId));
+                        }
+
                         _acknowledgementTokens.Add(acknowledgementToken.MessageId, acknowledgementToken);
 
-                        _receivedMessages.Enqueue(new ReceivedMessage(
-                            new MemoryStream(Convert.FromBase64String(message.MessageText)),
-                            acknowledgementToken));
+                        _receivedMessages.Enqueue(new ReceivedMessage(new MemoryStream(Convert.FromBase64String(message.MessageText)), acknowledgementToken));
                     }
                 }
 

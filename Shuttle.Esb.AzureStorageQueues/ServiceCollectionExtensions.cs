@@ -24,6 +24,7 @@ namespace Shuttle.Esb.AzureStorageQueues
                 {
                     options.StorageAccount = pair.Value.StorageAccount;
                     options.ConnectionString = pair.Value.ConnectionString;
+                    options.VisibilityTimeout = pair.Value.VisibilityTimeout;
                     options.MaxMessages = pair.Value.MaxMessages;
 
                     if (options.MaxMessages < 1)
