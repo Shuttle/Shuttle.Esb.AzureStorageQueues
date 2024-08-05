@@ -16,7 +16,7 @@
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
       <dependency id="Azure.Identity" version="1.12.0" />
-      <dependency id="Azure.Storage.Queues" version="12.19.0" />
+      <dependency id="Azure.Storage.Queues" version="12.19.1" />
       <dependency id="Shuttle.Esb" version="15.0.0" />
 		</dependencies>
 	</metadata>
