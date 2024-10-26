@@ -1,23 +1,21 @@
-﻿using Azure.Storage.Queues;
+﻿using System;
+using Azure.Storage.Queues;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Esb.AzureStorageQueues
+namespace Shuttle.Esb.AzureStorageQueues;
+
+public class ConfigureEventArgs
 {
-    public class ConfigureEventArgs
+    private QueueClientOptions _queueClientOptions;
+
+    public ConfigureEventArgs(QueueClientOptions queueClientOptions)
     {
-        private QueueClientOptions _queueClientOptions;
+        _queueClientOptions = Guard.AgainstNull(queueClientOptions);
+    }
 
-        public QueueClientOptions QueueClientOptions
-        {
-            get => _queueClientOptions;
-            set => _queueClientOptions = value ?? throw new System.ArgumentNullException();
-        }
-
-        public ConfigureEventArgs(QueueClientOptions queueClientOptions)
-        {
-            Guard.AgainstNull(queueClientOptions, nameof(queueClientOptions));
-
-            _queueClientOptions = queueClientOptions;
-        }
+    public QueueClientOptions QueueClientOptions
+    {
+        get => _queueClientOptions;
+        set => _queueClientOptions = value ?? throw new ArgumentNullException();
     }
 }

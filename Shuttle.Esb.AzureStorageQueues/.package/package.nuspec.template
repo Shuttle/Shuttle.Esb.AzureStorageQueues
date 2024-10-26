@@ -15,7 +15,7 @@
 		<copyright>Copyright (c) #{Year}#, Eben Roux</copyright>
 		<tags>azure azurestoragequeue azurequeue azuremq</tags>
 		<dependencies>
-#{Dependencies}#
+			#{Dependencies}#
 		</dependencies>
 	</metadata>
 	<files>

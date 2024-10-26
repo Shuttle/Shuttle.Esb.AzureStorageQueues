@@ -2,30 +2,28 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Esb.AzureStorageQueues
+namespace Shuttle.Esb.AzureStorageQueues;
+
+public class AzureStorageQueueBuilder
 {
-    public class AzureStorageQueueBuilder
+    internal readonly Dictionary<string, AzureStorageQueueOptions> AzureStorageQueueOptions = new();
+
+    public AzureStorageQueueBuilder(IServiceCollection services)
     {
-        internal readonly Dictionary<string, AzureStorageQueueOptions> AzureStorageQueueOptions = new Dictionary<string, AzureStorageQueueOptions>();
-        public IServiceCollection Services { get; }
+        Services = Guard.AgainstNull(services);
+    }
 
-        public AzureStorageQueueBuilder(IServiceCollection services)
-        {
-            Guard.AgainstNull(services, nameof(services));
-            
-            Services = services;
-        }
+    public IServiceCollection Services { get; }
 
-        public AzureStorageQueueBuilder AddOptions(string name, AzureStorageQueueOptions azureStorageQueueOptions)
-        {
-            Guard.AgainstNullOrEmptyString(name, nameof(name));
-            Guard.AgainstNull(azureStorageQueueOptions, nameof(azureStorageQueueOptions));
+    public AzureStorageQueueBuilder AddOptions(string name, AzureStorageQueueOptions azureStorageQueueOptions)
+    {
+        Guard.AgainstNullOrEmptyString(name);
+        Guard.AgainstNull(azureStorageQueueOptions);
 
-            AzureStorageQueueOptions.Remove(name);
+        AzureStorageQueueOptions.Remove(name);
 
-            AzureStorageQueueOptions.Add(name, azureStorageQueueOptions);
+        AzureStorageQueueOptions.Add(name, azureStorageQueueOptions);
 
-            return this;
-        }
+        return this;
     }
 }
