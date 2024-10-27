@@ -301,8 +301,6 @@ public class AzureStorageQueue : IQueue, ICreateQueue, IDropQueue, IDisposable, 
 
     public async Task AcknowledgeAsync(object acknowledgementToken)
     {
-        Guard.AgainstNull(acknowledgementToken);
-
         if (_cancellationToken.IsCancellationRequested)
         {
             Operation?.Invoke(this, new("[acknowledge/cancelled]"));
@@ -311,7 +309,7 @@ public class AzureStorageQueue : IQueue, ICreateQueue, IDropQueue, IDisposable, 
 
         await _lock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
-        if (!(acknowledgementToken is AcknowledgementToken data))
+        if (Guard.AgainstNull(acknowledgementToken) is not AcknowledgementToken data)
         {
             return;
         }
