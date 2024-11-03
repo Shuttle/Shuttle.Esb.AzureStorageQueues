@@ -15,12 +15,6 @@ public class AzureStorageQueueFixture : BasicQueueFixture
     }
 
     [Test]
-    public void Should_be_able_to_release_a_message()
-    {
-        TestReleaseMessage(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
-    }
-
-    [Test]
     public async Task Should_be_able_to_release_a_message_async()
     {
         await TestReleaseMessageAsync(AzureStorageQueueConfiguration.GetServiceCollection(), "azuresq://azure/{0}");
