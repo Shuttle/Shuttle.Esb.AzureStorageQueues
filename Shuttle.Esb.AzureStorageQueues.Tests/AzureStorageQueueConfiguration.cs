@@ -2,34 +2,33 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Shuttle.Esb.AzureStorageQueues.Tests
+namespace Shuttle.Esb.AzureStorageQueues.Tests;
+
+public static class AzureStorageQueueConfiguration
 {
-    public static class AzureStorageQueueConfiguration
+    public static IServiceCollection GetServiceCollection()
     {
-        public static IServiceCollection GetServiceCollection()
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+
+        services.AddAzureStorageQueues(builder =>
         {
-            var services = new ServiceCollection();
-
-            services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
-
-            services.AddAzureStorageQueues(builder =>
+            var azureStorageQueueOptions = new AzureStorageQueueOptions
             {
-                var azureStorageQueueOptions = new AzureStorageQueueOptions
-                {
-                    ConnectionString = "UseDevelopmentStorage=true",
-                    MaxMessages = 20,
-                    VisibilityTimeout = null
-                };
+                ConnectionString = "UseDevelopmentStorage=true",
+                MaxMessages = 20,
+                VisibilityTimeout = null
+            };
 
-                azureStorageQueueOptions.Configure += (sender, args) =>
-                {
-                    Console.WriteLine($"[event] : Configure / Uri = '{((IQueue)sender).Uri}'");
-                };
+            azureStorageQueueOptions.Configure += (sender, _) =>
+            {
+                Console.WriteLine($@"[event] : Configure / Uri = '{(sender as IQueue)?.Uri}'");
+            };
 
-                builder.AddOptions("azure", azureStorageQueueOptions);
-            });
+            builder.AddOptions("azure", azureStorageQueueOptions);
+        });
 
-            return services;
-        }
+        return services;
     }
-}           
+}
